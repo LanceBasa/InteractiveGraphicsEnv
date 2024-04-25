@@ -45,7 +45,24 @@ void PanningCamera::update(const Window& window, float dt, bool controls_enabled
     pitch = clamp(pitch, PITCH_MIN, PITCH_MAX);
     distance = clamp(distance, MIN_DISTANCE, MAX_DISTANCE);
 
-    view_matrix = glm::translate(glm::vec3{0.0f, 0.0f, -distance});
+
+    // pitch is rotation around x axis (moving camera angle up and down)
+    // yaw is rotation around y axis ( moving camera angle left and right)
+
+    glm::vec3 viewAngle{
+        // this is angle of elevation multiplying by angle of horizontal rotation
+        //  sin(yaw) change in camera's position along the x axis when rotating around the x axis
+        cos(pitch) * sin(yaw), 
+        sin(pitch),             // the angle of elevation
+        // similar to first one its the angle of elevation by angle of vertical rotation
+        cos(pitch) * cos(yaw)  
+    };
+
+
+    // update the view matrix.
+    // need to take into account the change in view ange, change in camera position in interface (focus_point),
+    // and the camera angle, this case, camera is looking up
+    view_matrix = glm::lookAt(focus_point - viewAngle * distance, focus_point, glm::vec3{0, 1, 0});
     inverse_view_matrix = glm::inverse(view_matrix);
 
     projection_matrix = glm::infinitePerspective(fov, window.get_framebuffer_aspect_ratio(), 1.0f);
