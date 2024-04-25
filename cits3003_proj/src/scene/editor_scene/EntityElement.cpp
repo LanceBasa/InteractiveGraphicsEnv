@@ -65,6 +65,8 @@ json EditorScene::EntityElement::into_json() const {
 }
 
 void EditorScene::EntityElement::add_imgui_edit_section(MasterRenderScene& render_scene, const SceneContext& scene_context) {
+    bool material_changed = false;
+    
     ImGui::Text("Entity");
     SceneElement::add_imgui_edit_section(render_scene, scene_context);
 
@@ -75,7 +77,9 @@ void EditorScene::EntityElement::add_imgui_edit_section(MasterRenderScene& rende
     scene_context.model_loader.add_imgui_model_selector("Model Selection", rendered_entity->model);
     scene_context.texture_loader.add_imgui_texture_selector("Diffuse Texture", rendered_entity->render_data.diffuse_texture);
     scene_context.texture_loader.add_imgui_texture_selector("Specular Map", rendered_entity->render_data.specular_map_texture, false);
+    
     ImGui::Spacing();
+
 }
 
 void EditorScene::EntityElement::update_instance_data() {
