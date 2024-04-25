@@ -46,10 +46,10 @@ void PanningCamera::update(const Window& window, float dt, bool controls_enabled
     distance = clamp(distance, MIN_DISTANCE, MAX_DISTANCE);
 
 
+    // create a new view matrix to use to account for changes in rotation around x and y axis (pitch and yaw) from the interface
     // pitch is rotation around x axis (moving camera angle up and down)
     // yaw is rotation around y axis ( moving camera angle left and right)
-
-    glm::vec3 viewAngle{
+    glm::vec3 newView{
         // this is angle of elevation multiplying by angle of horizontal rotation
         //  sin(yaw) change in camera's position along the x axis when rotating around the x axis
         cos(pitch) * sin(yaw), 
@@ -59,10 +59,12 @@ void PanningCamera::update(const Window& window, float dt, bool controls_enabled
     };
 
 
-    // update the view matrix.
-    // need to take into account the change in view ange, change in camera position in interface (focus_point),
-    // and the camera angle, this case, camera is looking up
-    view_matrix = glm::lookAt(focus_point - viewAngle * distance, focus_point, glm::vec3{0, 1, 0});
+    // update the hard coded view matrix to link changes in the interface.
+    // using lookAt to create a view matrix which requires position of camera, center of camera and elevation of camera
+    // position of camera - calculated using the new view with center of cameran and distance of camera
+    // focus point - object where the camera is centered using the variable thats connected to gui
+    // and the camera orrientation - meaning positive y points upwards
+    view_matrix = glm::lookAt(focus_point - newView * distance, focus_point, glm::vec3{0, 1, 0});
     inverse_view_matrix = glm::inverse(view_matrix);
 
     projection_matrix = glm::infinitePerspective(fov, window.get_framebuffer_aspect_ratio(), 1.0f);
