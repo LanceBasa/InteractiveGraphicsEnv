@@ -30,6 +30,10 @@ void PanningCamera::update(const Window& window, float dt, bool controls_enabled
             auto pan = window.get_mouse_delta(GLFW_MOUSE_BUTTON_MIDDLE);
             focus_point += (x_basis * (float) -pan.x + y_basis * (float) pan.y) * PAN_SPEED * dt * distance / (float) window.get_window_height();
 
+
+            //need to update camera based on rotation around the focus point
+            glm::mat4 rot_matrix = glm::rotate(yaw, glm::vec3{0.0f, 1.0f, 0.0f}) * glm::rotate(pitch, glm::vec3{1.0f, 0.0f, 0.0f});
+
             pitch -= PITCH_SPEED * (float) window.get_mouse_delta(GLFW_MOUSE_BUTTON_RIGHT).y;
             yaw -= YAW_SPEED * (float) window.get_mouse_delta(GLFW_MOUSE_BUTTON_RIGHT).x;
             distance -= ZOOM_SCROLL_MULTIPLIER * ZOOM_SPEED * window.get_scroll_delta();
@@ -45,7 +49,19 @@ void PanningCamera::update(const Window& window, float dt, bool controls_enabled
     pitch = clamp(pitch, PITCH_MIN, PITCH_MAX);
     distance = clamp(distance, MIN_DISTANCE, MAX_DISTANCE);
 
-    view_matrix = glm::translate(glm::vec3{0.0f, 0.0f, -distance});
+    // x_roate --> pitch
+    // yroate --> yaw
+
+
+    // Create rot matrix for x and y rotation
+    // Create and store the distance vector
+
+    glm::mat4 rot_matrix = glm::rotate(-pitch, glm::vec3{1.0f, 0.0f, 0.0f}) * glm::rotate(-yaw, glm::vec3{0.0f, 1.0f, 0.0f});
+    glm::vec3 Dist = glm::vec3{0.0f, 0.0f, -distance};
+
+    // update the view matrix to be the inverse of the rot matrix and the distance vector and then translate it to the focus point
+    view_matrix = glm::translate(-focus_point) * glm::translate(Dist) * rot_matrix;
+
     inverse_view_matrix = glm::inverse(view_matrix);
 
     projection_matrix = glm::infinitePerspective(fov, window.get_framebuffer_aspect_ratio(), 1.0f);
