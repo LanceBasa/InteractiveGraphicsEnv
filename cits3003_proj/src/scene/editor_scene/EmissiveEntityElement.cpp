@@ -72,6 +72,9 @@ void EditorScene::EmissiveEntityElement::add_imgui_edit_section(MasterRenderScen
     scene_context.model_loader.add_imgui_model_selector("Model Selection", rendered_entity->model);
     scene_context.texture_loader.add_imgui_texture_selector("Emission Texture", rendered_entity->render_data.emission_texture);
     ImGui::Spacing();
+
+
+    
 }
 
 void EditorScene::EmissiveEntityElement::update_instance_data() {

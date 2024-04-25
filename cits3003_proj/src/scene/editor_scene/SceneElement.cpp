@@ -116,14 +116,37 @@ json EditorScene::LocalTransformComponent::local_transform_into_json() const {
     }};
 }
 
-void EditorScene::LitMaterialComponent::add_material_imgui_edit_section(MasterRenderScene& /*render_scene*/, const SceneContext& /*scene_context*/) {
+void EditorScene::LitMaterialComponent::add_material_imgui_edit_section(MasterRenderScene& render_scene, const SceneContext& scene_context) {
     // Set this to true if the user has changed any of the material values, otherwise the changes won't be propagated
     bool material_changed = false;
     ImGui::Text("Material");
 
     // Add UI controls here
-
+    material_changed |= ImGui::ColorEdit3("DiffuseTint", &material.diffuse_tint[0]);
     ImGui::Spacing();
+    material_changed |= ImGui::DragFloat("Diffuse factor", &material.diffuse_tint.a, 0.01f, 0.0f, FLT_MAX);
+    ImGui::DragDisableCursor(scene_context.window);
+    ImGui::Spacing();
+
+
+    material_changed |= ImGui::ColorEdit3("Specular Tint", &material.specular_tint[0]);
+    ImGui::Spacing();
+    material_changed |= ImGui::DragFloat("Specular factor", &material.specular_tint.a, 0.01f, 0.0f, FLT_MAX);
+    ImGui::DragDisableCursor(scene_context.window);
+    ImGui::Spacing();
+
+    material_changed |= ImGui::ColorEdit3("Ambient Tint", &material.ambient_tint[0]);
+    ImGui::Spacing();
+    material_changed |= ImGui::DragFloat("Ambient factor", &material.ambient_tint.a, 0.01f, 0.0f, FLT_MAX);
+    ImGui::DragDisableCursor(scene_context.window);
+    ImGui::Spacing();
+
+    // ASk tute about limit.
+    material_changed |= ImGui::DragFloat("Shininess", &material.shininess,1.0f, 0.0f, 500);
+    ImGui::DragDisableCursor(scene_context.window);
+    ImGui::Spacing();
+
+    
     if (material_changed) {
         update_instance_data();
     }
@@ -146,12 +169,14 @@ json EditorScene::LitMaterialComponent::material_into_json() const {
     }};
 }
 
-void EditorScene::EmissiveMaterialComponent::add_emissive_material_imgui_edit_section(MasterRenderScene& /*render_scene*/, const SceneContext& /*scene_context*/) {
+void EditorScene::EmissiveMaterialComponent::add_emissive_material_imgui_edit_section(MasterRenderScene& render_scene, const SceneContext& scene_context) {
     // Set this to true if the user has changed any of the material values, otherwise the changes won't be propagated
     bool material_changed = false;
     ImGui::Text("Emissive Material");
 
     // Add UI controls here
+    SceneElement::add_imgui_edit_section(render_scene, scene_context);
+
 
     ImGui::Spacing();
     if (material_changed) {
