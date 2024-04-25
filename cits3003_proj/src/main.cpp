@@ -12,7 +12,7 @@
 #include "scene/SceneContext.h"
 
 #define GLFW_INCLUDE_NONE
-
+//hehe
 int main() {
     // Set up the window manager, then create a window with and make it the current context.
     WindowManager::init();
