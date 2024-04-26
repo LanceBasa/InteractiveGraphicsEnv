@@ -506,6 +506,9 @@ void EditorScene::EditorScene::add_labelled_json_element(const SceneContext& sce
         std::cerr << j["error"] << std::endl;
         return;
     }
+            printf("good");
+
+
 
     std::string label = j["label"];
 
@@ -514,17 +517,28 @@ void EditorScene::EditorScene::add_labelled_json_element(const SceneContext& sce
         std::cerr << "No generator for label: [" << label << "]" << std::endl;
         return;
     }
+            printf("good2");
 
     ElementRef ref;
     {
+                            printf("good3.5");
+
         auto element = gen->second(scene_context, parent, j);
+                            printf("good3.4");
+
         element->load_json(j);
+            printf("good3.1");
 
         element->add_to_render_scene(render_scene);
+                    printf("good3.2");
+
         list->push_back(std::move(element));
+                            printf("good3.3");
+
         ref = list->end();
         ref--;
     }
+            printf("good4");
 
     if (j.contains("children")) {
         for (const auto& child: j["children"]) {
@@ -608,18 +622,23 @@ void EditorScene::EditorScene::load_from_json_file(const SceneContext& scene_con
     std::swap(render_scene, old_render_scene);
     std::swap(scene_root, old_scene_root);
     try {
+
         selected_element = NullElementRef;
 
         std::ifstream f(save_path.value());
         json data = json::parse(f);
 
         for (const auto& item: data) {
+
+
             add_labelled_json_element(scene_context, NullElementRef, scene_root, item);
         }
 
         for (auto& item: *scene_root) {
             item->update_instance_data();
+
         }
+
     } catch (const std::exception& e) {
         std::swap(save_path, old_path);
         render_scene = std::move(old_render_scene);

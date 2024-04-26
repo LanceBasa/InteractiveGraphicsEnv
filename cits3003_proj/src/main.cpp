@@ -82,6 +82,7 @@ int main() {
                 // Tell ImGUI that we are starting a new frame, and to handle the docked/floating windows.
                 imgui_manager.new_frame();
                 ImGuiManager::enable_main_window_docking();
+                
             }
             // Tell the MasterRenderer that we are staring a new frame
             master_renderer.update(window);

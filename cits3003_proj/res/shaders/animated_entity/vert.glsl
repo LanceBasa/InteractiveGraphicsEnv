@@ -36,6 +36,7 @@ uniform mat4 bone_transforms[BONE_TRANSFORMS];
 // Global data
 uniform vec3 ws_view_position;
 uniform mat4 projection_view_matrix;
+uniform float texture_scale;
 
 uniform sampler2D specular_map_texture;
 
@@ -55,7 +56,7 @@ void main() {
 
     vec3 ws_position = (animation_matrix * vec4(vertex_position, 1.0f)).xyz;
     vec3 ws_normal = normalize(normal_matrix * normal);
-    vertex_out.texture_coordinate = texture_coordinate;
+    vertex_out.texture_coordinate = texture_coordinate * texture_scale;
 
     gl_Position = projection_view_matrix * vec4(ws_position, 1.0f);
 
