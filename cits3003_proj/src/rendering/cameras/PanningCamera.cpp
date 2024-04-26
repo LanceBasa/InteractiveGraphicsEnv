@@ -60,7 +60,7 @@ void PanningCamera::update(const Window& window, float dt, bool controls_enabled
     glm::vec3 Dist = glm::vec3{0.0f, 0.0f, -distance};
 
     // update the view matrix to be the inverse of the rot matrix and the distance vector and then translate it to the focus point
-    view_matrix = glm::translate(-focus_point) * glm::translate(Dist) * rot_matrix;
+    view_matrix =  glm::translate(Dist) * rot_matrix * glm::translate(-focus_point);
 
     inverse_view_matrix = glm::inverse(view_matrix);
 

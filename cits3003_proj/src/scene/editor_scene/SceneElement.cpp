@@ -142,7 +142,7 @@ void EditorScene::LitMaterialComponent::add_material_imgui_edit_section(MasterRe
     ImGui::Spacing();
 
     // ASk tute about limit.
-    material_changed |= ImGui::DragFloat("Shininess", &material.shininess,1.0f, 0.0f, 500);
+    material_changed |= ImGui::DragFloat("Shininess", &material.shininess,0.01f, 0.0f, FLT_MAX);
     ImGui::DragDisableCursor(scene_context.window);
     ImGui::Spacing();
 
@@ -175,7 +175,16 @@ void EditorScene::EmissiveMaterialComponent::add_emissive_material_imgui_edit_se
     ImGui::Text("Emissive Material");
 
     // Add UI controls here
-    SceneElement::add_imgui_edit_section(render_scene, scene_context);
+    // SceneElement::add_imgui_edit_section(render_scene, scene_context);
+
+    material_changed |= ImGui::ColorEdit3("Emission tint", & material.emission_tint[0]);
+    ImGui::Spacing();
+    material_changed |= ImGui::DragFloat("Emission factor", &material.emission_tint.a, 0.01f, 0.0f, FLT_MAX);
+    ImGui::DragDisableCursor(scene_context.window);
+    ImGui::Spacing();
+    
+
+
 
 
     ImGui::Spacing();
