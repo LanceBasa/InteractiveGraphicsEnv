@@ -76,6 +76,9 @@ void EditorScene::EntityElement::add_imgui_edit_section(MasterRenderScene& rende
     scene_context.texture_loader.add_imgui_texture_selector("Diffuse Texture", rendered_entity->render_data.diffuse_texture);
     scene_context.texture_loader.add_imgui_texture_selector("Specular Map", rendered_entity->render_data.specular_map_texture, false);
     ImGui::Spacing();
+
+    
+
 }
 
 void EditorScene::EntityElement::update_instance_data() {

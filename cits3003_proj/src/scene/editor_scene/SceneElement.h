@@ -103,6 +103,7 @@ namespace EditorScene {
     public:
         BaseLitEntityMaterial material;
 
+
     protected:
         explicit LitMaterialComponent(const BaseLitEntityMaterial& material) : material(material) {}
 

@@ -79,6 +79,8 @@ json EditorScene::AnimatedEntityElement::into_json() const {
 }
 
 void EditorScene::AnimatedEntityElement::add_imgui_edit_section(MasterRenderScene& render_scene, const SceneContext& scene_context) {
+        bool material_changed = false;
+
     ImGui::Text("Animated Entity");
     SceneElement::add_imgui_edit_section(render_scene, scene_context);
 
@@ -93,6 +95,10 @@ void EditorScene::AnimatedEntityElement::add_imgui_edit_section(MasterRenderScen
     scene_context.texture_loader.add_imgui_texture_selector("Diffuse Texture", rendered_entity->render_data.diffuse_texture);
     scene_context.texture_loader.add_imgui_texture_selector("Specular Map", rendered_entity->render_data.specular_map_texture, false);
     ImGui::Spacing();
+    
+    //need to add slider for texture scaling
+
+
 }
 
 void EditorScene::AnimatedEntityElement::update_instance_data() {
