@@ -23,11 +23,11 @@ json EditorScene::SceneElement::texture_to_json(const std::shared_ptr<TextureHan
         };
     }
 
-    return { "texture", {
+    return {
         {"filename",   texture->get_filename().value()},
         {"is_srgb",    texture->is_srgb()},
         {"is_flipped", texture->is_flipped()},
-    }};
+    };
 }
 
 std::shared_ptr<TextureHandle> EditorScene::SceneElement::texture_from_json(const SceneContext& scene_context, const json& json) {
