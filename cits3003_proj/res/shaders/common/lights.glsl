@@ -31,16 +31,14 @@ void point_light_calculation(PointLightData point_light, LightCalculatioData cal
 
 
     // using this we can get the light distance to the object
-    vec3 ws_light_offset = point_light.position - calculation_data.ws_frag_position;
-
-    
+    vec3 ws_light_offset = point_light.position - calculation_data.ws_frag_position; 
     float distance = length(ws_light_offset);       // length is a function that calculates the length from Euclidean distance between the fragment position and
     float lossRate=0.2;                        // Rate of quickly the light loss with distance.
     float attenuation = 1.0 / (1.0 + lossRate * distance + (lossRate* distance*distance));        // From lecture calculating Light attenuation with distance
 
 
     // Ambient
-    vec3 ambient_component = ambient_factor * point_light.colour *attenuation;
+    vec3 ambient_component = ambient_factor * point_light.colour; // ambiance doesnt require attenuation (distance)
 
     // Diffuse
     vec3 ws_light_dir = normalize(ws_light_offset);
