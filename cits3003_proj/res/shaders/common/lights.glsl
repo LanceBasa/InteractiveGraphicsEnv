@@ -22,6 +22,8 @@ struct PointLightData {
     vec3 colour;
 };
 
+
+
 // Calculations
 
 const float ambient_factor = 0.002f;
