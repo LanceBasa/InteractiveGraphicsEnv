@@ -20,6 +20,7 @@ class MasterRenderScene {
     EmissiveEntityRenderer::RenderScene emissive_entity_scene{};
 
     LightScene light_scene{};
+    LightSceneDirection light_scene_dir{};
 public:
     MasterRenderScene() = default;
 
@@ -36,6 +37,10 @@ public:
     void insert_light(std::shared_ptr<PointLight> point_light);
 
     bool remove_light(const std::shared_ptr<PointLight>& point_light);
+
+    void insert_light(std::shared_ptr<PointLightDirection> point_light_dir);
+
+    bool remove_light(const std::shared_ptr<PointLightDirection>& point_light_dir);
 
     /// Propagates a camera state to all the render scenes
     void use_camera(const CameraInterface& camera_interface);

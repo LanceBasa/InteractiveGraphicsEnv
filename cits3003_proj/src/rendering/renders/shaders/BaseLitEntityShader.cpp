@@ -59,3 +59,20 @@ void BaseLitEntityShader::set_point_lights(const std::vector<PointLight>& point_
     point_lights_ubo.bind(POINT_LIGHT_BINDING);
     point_lights_ubo.upload();
 }
+
+void BaseLitEntityShader::set_directional_light(const std::vector<PointLightDirection>& point_lights_dir) {
+    uint count = std::min(MAX_PL, (uint) point_lights_dir.size());
+
+    for (uint i = 0; i < count; i++) {
+        const PointLightDirection& point_light_dir = point_lights_dir[i];
+
+        glm::vec3 scaled_colour = glm::vec3(point_light_dir.colour) * point_light_dir.colour.a;
+
+        point_lights_ubo.data[i].position = point_light_dir.position;
+        point_lights_ubo.data[i].colour = scaled_colour;
+    }
+
+    set_frag_define("NUM_DL", Formatter() << count);
+    point_lights_ubo.bind(POINT_LIGHT_BINDING);
+    point_lights_ubo.upload();
+}

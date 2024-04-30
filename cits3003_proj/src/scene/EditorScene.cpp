@@ -9,7 +9,7 @@
 #include "editor_scene/EntityElement.h"
 #include "editor_scene/AnimatedEntityElement.h"
 #include "editor_scene/EmissiveEntityElement.h"
-#include "editor_scene/PointLightElement.h"
+#include "editor_scene/PointLightDir.h"
 #include "editor_scene/GroupElement.h"
 #include "scene/SceneContext.h"
 
@@ -61,7 +61,7 @@ void EditorScene::EditorScene::open(const SceneContext& scene_context) {
     auto default_light_col = glm::vec3(1.0f);
 
     /// Crate the default point light, which also controls the light sphere
-    auto default_light = std::make_unique<PointLightElement>(
+    auto default_light = std::make_unique<PointLightDir>(
         NullElementRef,
         "Default Point Light",
         default_light_pos,
@@ -100,7 +100,7 @@ void EditorScene::EditorScene::open(const SceneContext& scene_context) {
 
     /// All the light generators, new light types must be registered here to be able to be created in the UI
     light_generators = {
-        {PointLightElement::ELEMENT_TYPE_NAME, [](const SceneContext& scene_context, ElementRef parent) { return PointLightElement::new_default(scene_context, parent); }},
+        {PointLightDir::ELEMENT_TYPE_NAME, [](const SceneContext& scene_context, ElementRef parent) { return PointLightDir::new_default(scene_context, parent); }},
     };
 
     /// All the element generators, new element types must be registered here to be able to be loaded from json
@@ -108,8 +108,9 @@ void EditorScene::EditorScene::open(const SceneContext& scene_context) {
         {EntityElement::ELEMENT_TYPE_NAME,         [](const SceneContext& scene_context, ElementRef parent, const json& j) { return EntityElement::from_json(scene_context, parent, j); }},
         {AnimatedEntityElement::ELEMENT_TYPE_NAME, [](const SceneContext& scene_context, ElementRef parent, const json& j) { return AnimatedEntityElement::from_json(scene_context, parent, j); }},
         {EmissiveEntityElement::ELEMENT_TYPE_NAME, [](const SceneContext& scene_context, ElementRef parent, const json& j) { return EmissiveEntityElement::from_json(scene_context, parent, j); }},
-        {PointLightElement::ELEMENT_TYPE_NAME,     [](const SceneContext& scene_context, ElementRef parent, const json& j) { return PointLightElement::from_json(scene_context, parent, j); }},
+        {PointLightDir::ELEMENT_TYPE_NAME,     [](const SceneContext& scene_context, ElementRef parent, const json& j) { return PointLightDir::from_json(scene_context, parent, j); }},
         {GroupElement::ELEMENT_TYPE_NAME,          [](const SceneContext&, ElementRef parent, const json& j) { return GroupElement::from_json(parent, j); }},
+        {PointLight::ELEMENT_TYPE_NAME,            [](const SceneContext&, ElementRef parent, const json& j) { return PointLight::from_json(parent, j); }},
     };
 }
 

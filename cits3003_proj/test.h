@@ -1,5 +1,5 @@
-#ifndef ANIMATED_ENTITY_RENDERER_H
-#define ANIMATED_ENTITY_RENDERER_H
+#ifndef ENTITY_RENDERER_H
+#define ENTITY_RENDERER_H
 
 #include <utility>
 #include <vector>
@@ -18,16 +18,11 @@
 
 #include "rendering/renders/shaders/BaseLitEntityShader.h"
 
-#define BONE_TRANSFORMS 64
-#define BONE_TRANSFORMS_STR "64"
-
-namespace AnimatedEntityRenderer {
+namespace EntityRenderer {
     struct VertexData {
         glm::vec3 position;
         glm::vec3 normal;
         glm::vec2 texture_coordinate;
-        glm::vec4 bone_weights;
-        glm::uvec4 bone_indices;
 
         static void from_mesh(const VertexCollection& vertex_collection, std::vector<VertexData>& out_vertices);
         static void setup_attrib_pointers();
@@ -38,36 +33,30 @@ namespace AnimatedEntityRenderer {
     using GlobalData = BaseLitEntityGlobalData;
     using RenderData = BaseLitEntityRenderData;
 
-    using Entity = AnimatedRenderedEntity<VertexData, InstanceData, RenderData>;
+    using Entity = RenderedEntity<VertexData, InstanceData, RenderData>;
 
     using RenderScene = RenderScene<Entity, GlobalData>;
 
-    class AnimatedEntityShader : public BaseLitEntityShader {
-        // Animation Data
-        int bone_transforms_location{};
+    class EntityShader : public BaseLitEntityShader {
+        int normal_matrix_location{};
     public:
-        AnimatedEntityShader();
+        EntityShader();
 
-        void set_model_matrix(const glm::mat4& model_matrix);
-
-        void set_bone_transforms(const std::vector<glm::mat4>& bone_transforms);
-    private:
-        // Override get_uniforms_set_bindings to get the extra uniform for bone transforms
+        void set_instance_data(const BaseLitEntityInstanceData& instance_data);
+    protected:
         void get_uniforms_set_bindings() override;
     };
 
-    class AnimatedEntityRenderer {
-        AnimatedEntityShader shader;
+    class EntityRenderer {
+        EntityShader shader;
 
     public:
-        AnimatedEntityRenderer();
+        EntityRenderer();
 
         void render(const RenderScene& render_scene, const LightScene& light_scene);
-
-        void render_dir(const RenderScene& render_scene, const LightSceneDirection& light_scene_dire);
 
         bool refresh_shaders();
     };
 }
 
-#endif //ANIMATED_ENTITY_RENDERER_H
+#endif //ENTITY_RENDERER_H

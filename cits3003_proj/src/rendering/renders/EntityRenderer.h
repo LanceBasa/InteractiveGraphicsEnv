@@ -55,6 +55,8 @@ namespace EntityRenderer {
 
         void render(const RenderScene& render_scene, const LightScene& light_scene);
 
+        void render_dir(const RenderScene& render_scene, const LightSceneDirection& light_scene_dire);
+
         bool refresh_shaders();
     };
 }

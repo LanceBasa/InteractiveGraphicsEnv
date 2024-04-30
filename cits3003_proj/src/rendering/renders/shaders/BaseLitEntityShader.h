@@ -47,6 +47,7 @@ using BaseLitEntityGlobalData = BaseEntityGlobalData;
 class BaseLitEntityShader : public BaseEntityShader {
 public:
     static constexpr uint MAX_PL = 16;
+    static constexpr uint MAX_PL_DIR = 4;
 
 protected:
     // Material
@@ -67,6 +68,8 @@ public:
     void set_instance_data(const BaseLitEntityInstanceData& instance_data);
 
     void set_point_lights(const std::vector<PointLight>& point_lights);
+
+    void set_directional_light(const std::vector<PointLightDirection>& point_lights_dir); 
 protected:
     void get_uniforms_set_bindings() override;
 };
