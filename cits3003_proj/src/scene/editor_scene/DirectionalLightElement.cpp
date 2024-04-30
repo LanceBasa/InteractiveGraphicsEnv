@@ -1,4 +1,4 @@
-#include "DirectionLightElement.h"
+#include "DirectionalLightElement.h"
 
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/component_wise.hpp>

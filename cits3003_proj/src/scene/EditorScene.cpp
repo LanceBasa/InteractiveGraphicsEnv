@@ -10,7 +10,7 @@
 #include "editor_scene/AnimatedEntityElement.h"
 #include "editor_scene/EmissiveEntityElement.h"
 #include "editor_scene/PointLightElement.h"
-#include "editor_scene/DirectionLightElement.h"
+#include "editor_scene/DirectionalLightElement.h"
 
 #include "editor_scene/GroupElement.h"
 #include "scene/SceneContext.h"
