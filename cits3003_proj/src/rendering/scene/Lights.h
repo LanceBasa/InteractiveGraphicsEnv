@@ -34,6 +34,35 @@ struct PointLight {
     };
 };
 
+
+
+
+struct DirectionLight {
+    DirectionLight() = default;
+
+    DirectionLight(const glm::vec3& direction, const glm::vec4& colour) :
+        direction(direction), colour(colour) {}
+
+    static DirectionLight off() {
+        return {glm::vec3{}, glm::vec4{}};
+    }
+
+    static std::shared_ptr<DirectionLight> create(const glm::vec3& direction, const glm::vec4& colour) {
+        return std::make_shared<DirectionLight>(direction, colour);
+    }
+
+    glm::vec3 direction{};
+    // Alpha components are just used to store a scalar that is applied before passing to the GPU
+    glm::vec4 colour{};
+
+    // On GPU format
+    // alignas used to conform to std140 for direct binary usage with glsl
+    struct Data {
+        alignas(16) glm::vec3 direction;
+        alignas(16) glm::vec3 colour;
+    };
+};
+
 /// A collection of each light type, with helpers that allow for selecting a subset of
 /// those lights on a proximity basis, since processing an unbounded number of lights on the GPU is bad idea.
 struct LightScene {
@@ -54,6 +83,31 @@ struct LightScene {
     ///       as well as support incrementally getting the `k` nearest.
     ///
     std::vector<PointLight> get_nearest_point_lights(glm::vec3 target, size_t max_count, size_t min_count = 0) const;
+
+private:
+    template<typename Light>
+    static std::vector<Light> get_nearest_lights(const std::unordered_set<std::shared_ptr<Light>>& lights, glm::vec3 target, size_t max_count, size_t min_count = 0);
+};
+
+
+struct LightScene2 {
+    std::unordered_set<std::shared_ptr<DirectionLight>> direction_lights;
+
+    /// Will return up to `max_count` nearest point lights to `target`.
+    /// It returns less than `max_count` if there are not that many point lights,
+    /// in which case it will end up returning all point lights.
+    ///
+    /// If a `min_count` > 0 is provided, it will provide at least that many, with filling empty
+    /// slots with a "Black" light.
+    ///
+    /// NOTE: This is VERY inefficient as is, since it currently (possibly) sorts all lights,
+    ///       then copies out up to `max_count` point lights, so is O(n log(n)) for
+    ///       n being the total number of point lights.
+    ///
+    ///       So an improvement would be to use a data structure which can accelerate this,
+    ///       as well as support incrementally getting the `k` nearest.
+    ///
+    std::vector<DirectionLight> get_nearest_direction_lights(glm::vec3 target, size_t max_count, size_t min_count = 0) const;
 
 private:
     template<typename Light>
