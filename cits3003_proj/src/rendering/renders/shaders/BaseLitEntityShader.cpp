@@ -6,9 +6,10 @@ BaseLitEntityShader::BaseLitEntityShader(std::string name, const std::string& ve
                                          std::unordered_map<std::string, std::string> vert_defines,
                                          std::unordered_map<std::string, std::string> frag_defines) :
     BaseEntityShader(std::move(name), vertex_path, fragment_path, std::move(vert_defines), std::move(frag_defines)),
-    point_lights_ubo({}, false) {
+    point_lights_ubo({}, false),direction_lights_ubo({}, false) {
 
     get_uniforms_set_bindings();
+    
 }
 
 void BaseLitEntityShader::get_uniforms_set_bindings() {
@@ -57,5 +58,23 @@ void BaseLitEntityShader::set_point_lights(const std::vector<PointLight>& point_
 
     set_frag_define("NUM_PL", Formatter() << count);
     point_lights_ubo.bind(POINT_LIGHT_BINDING);
+    point_lights_ubo.upload();
+}
+
+//added for part h
+void BaseLitEntityShader::set_direction_lights(const std::vector<DirectionLight>& direction_lights) {
+    uint count = std::min(MAX_PL, (uint) direction_lights.size());
+
+    for (uint i = 0; i < count; i++) {
+        const DirectionLight& direction_light = direction_lights[i];
+
+        glm::vec3 scaled_colour = glm::vec3(direction_light.colour) * direction_light.colour.a;
+
+        point_lights_ubo.data[i].position = direction_light.direction;
+        point_lights_ubo.data[i].colour = scaled_colour;
+    }
+
+    set_frag_define("NUM_DL", Formatter() << count);
+    point_lights_ubo.bind(DIRECTION_LIGHT_BINDING);
     point_lights_ubo.upload();
 }
