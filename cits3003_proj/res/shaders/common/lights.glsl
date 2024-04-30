@@ -63,6 +63,19 @@ struct LightingResult {
     vec3 total_ambient;
 };
 
+
+vec3 resolve_textured_light_calculation(LightingResult lighting_result, sampler2D diffuse_texture, sampler2D specular_map_texture, vec2 texture_coordinate) {
+    vec3 diffuse_color = texture(diffuse_texture, texture_coordinate).rgb;
+    vec3 specular_color = texture(specular_map_texture, texture_coordinate).rgb;
+
+    // Calculate lighting using lighting_result, diffuse_color, and specular_color
+    // Example calculation:
+    vec3 lighting = lighting_result.ambient * diffuse_color + lighting_result.diffuse * diffuse_color + lighting_result.specular * specular_color;
+
+    return lighting;
+}
+
+
 LightingResult total_light_calculation(LightCalculatioData light_calculation_data, Material material
         #if NUM_PL > 0
         ,PointLightData point_lights[NUM_PL]

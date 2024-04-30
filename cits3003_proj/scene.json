@@ -1,9 +1,9 @@
 [
     {
         "diffuse_texture": {
-            "filename": "crate.png",
+            "filename": "[WHITE]",
             "is_flipped": false,
-            "is_srgb": true
+            "is_srgb": false
         },
         "enabled": true,
         "label": "Entity",
@@ -44,12 +44,12 @@
                 1.0,
                 1.0
             ],
-            "texture_scale": 1.6299999952316284
+            "texture_scale": 1.0
         },
         "model": "double_plane.obj",
         "name": "Ground Plane",
         "specular_map_texture": {
-            "filename": "crate_specular.png",
+            "filename": "[WHITE]",
             "is_flipped": false,
             "is_srgb": false
         }
