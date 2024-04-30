@@ -34,10 +34,40 @@ struct PointLight {
     };
 };
 
+struct DirectionLight {
+    DirectionLight() = default;
+
+    DirectionLight(const glm::vec3& direction, const glm::vec4& colour) :
+        direction(direction), colour(colour) {}
+
+    static DirectionLight off() {
+        return {glm::vec3{}, glm::vec4{}};
+    }
+
+    static std::shared_ptr<DirectionLight> create(const glm::vec3& direction, const glm::vec4& colour) {
+        return std::make_shared<DirectionLight>(direction, colour);   //FIX ME:  direction might need to be position
+    }
+
+    glm::vec3 direction{};
+    // Alpha components are just used to store a scalar that is applied before passing to the GPU
+    glm::vec4 colour{};
+
+    // On GPU format
+    // alignas used to conform to std140 for direct binary usage with glsl
+    struct Data {
+        alignas(16) glm::vec3 direction;
+        alignas(16) glm::vec3 colour;
+    };
+};
+
+
 /// A collection of each light type, with helpers that allow for selecting a subset of
 /// those lights on a proximity basis, since processing an unbounded number of lights on the GPU is bad idea.
 struct LightScene {
     std::unordered_set<std::shared_ptr<PointLight>> point_lights;
+
+    std::unordered_set<std::shared_ptr<DirectionLight>> direction_lights;
+
 
     /// Will return up to `max_count` nearest point lights to `target`.
     /// It returns less than `max_count` if there are not that many point lights,
@@ -55,9 +85,15 @@ struct LightScene {
     ///
     std::vector<PointLight> get_nearest_point_lights(glm::vec3 target, size_t max_count, size_t min_count = 0) const;
 
+    std::vector<DirectionLight> get_nearest_direction_lights(glm::vec3 target, size_t max_count, size_t min_count = 0) const;
+
 private:
     template<typename Light>
     static std::vector<Light> get_nearest_lights(const std::unordered_set<std::shared_ptr<Light>>& lights, glm::vec3 target, size_t max_count, size_t min_count = 0);
+
+    
 };
+
+
 
 #endif //LIGHTS_H

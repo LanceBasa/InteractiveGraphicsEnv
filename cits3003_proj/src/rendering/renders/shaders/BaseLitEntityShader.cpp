@@ -59,3 +59,8 @@ void BaseLitEntityShader::set_point_lights(const std::vector<PointLight>& point_
     point_lights_ubo.bind(POINT_LIGHT_BINDING);
     point_lights_ubo.upload();
 }
+
+void BaseLitEntityShader::set_direction_lights(const std::vector<DirectionLight>& direction_lights) {
+    // Not implemented
+    
+}

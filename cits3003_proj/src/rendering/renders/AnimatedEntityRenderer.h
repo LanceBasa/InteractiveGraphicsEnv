@@ -68,4 +68,19 @@ namespace AnimatedEntityRenderer {
     };
 }
 
+class AnimatedEntityShader : public BaseLitEntityShader {
+    // Directional Light Data
+    int directional_lights_location{};  // Uniform location for directional lights
+
+public:
+    AnimatedEntityShader();
+
+    void set_directional_lights(const std::vector<DirectionalLightData>& directional_lights);
+
+private:
+    // Override get_uniforms_set_bindings to get the extra uniform for directional lights
+    void get_uniforms_set_bindings() override;
+};
+
+
 #endif //ANIMATED_ENTITY_RENDERER_H

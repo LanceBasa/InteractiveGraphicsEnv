@@ -6,6 +6,12 @@ void MasterRenderScene::use_camera(const CameraInterface& camera_interface) {
     emissive_entity_scene.global_data.use_camera(camera_interface);
 }
 
+void MasterRenderScene::use_camera(const CameraInterface& camera_interface) {
+    entity_scene.global_data.use_camera(camera_interface);
+    animated_entity_scene.global_data.use_camera(camera_interface);
+    emissive_entity_scene.global_data.use_camera(camera_interface);
+    }
+
 void MasterRenderScene::insert_entity(std::shared_ptr<EntityRenderer::Entity> entity) {
     entity_scene.entities.insert(std::move(entity));
 }
@@ -36,4 +42,12 @@ void MasterRenderScene::insert_light(std::shared_ptr<PointLight> point_light) {
 
 bool MasterRenderScene::remove_light(const std::shared_ptr<PointLight>& point_light) {
     return light_scene.point_lights.erase(point_light) != 0;
+}
+
+void MasterRenderScene::insert_light(std::shared_ptr<DirectionalLight> directional_light) {
+    light_scene.direction_lights.insert(std::move(directional_light));
+}
+
+bool MasterRenderScene::remove_light(const std::shared_ptr<DirectionalLight>& directional_light) {
+    return light_scene.direction_lights.erase(directional_light) != 0;
 }

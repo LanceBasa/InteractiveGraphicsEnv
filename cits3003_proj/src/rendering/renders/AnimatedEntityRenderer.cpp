@@ -25,17 +25,18 @@ void AnimatedEntityRenderer::AnimatedEntityRenderer::render(const RenderScene& r
     shader.use();
     shader.set_global_data(render_scene.global_data);
 
-    for (const auto& entity: render_scene.entities) {
+    for (const auto& entity : render_scene.entities) {
         shader.set_instance_data(entity->instance_data);
 
         glm::vec3 position = entity->instance_data.model_matrix[3];
-        // IMPORTANT NOTE:
-        // This call has the potential to recompile the shader if the value for "NUM_PL" changes.
-        // If this where to happen for every entity, it would MASSIVELY kill performance (and possibly just not even work at all).
-        // However, in this case, consecutive get_nearest_point_lights calls WILL return the same number of items,
-        // so that issue won't happen since it only recompiles on a change.
-        // Just make sure to be careful of this kind of thing.
+
+        // Set Point Lights
         shader.set_point_lights(light_scene.get_nearest_point_lights(position, BaseLitEntityShader::MAX_PL, 1));
+
+        // Set Directional Lights if present
+        #if NUM_DL > 0
+        shader.set_directional_lights(light_scene.get_nearest_direction_lights(position, BaseLitEntityShader::MAX_DL, 1));
+        #endif
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, entity->render_data.diffuse_texture->get_texture_id());
@@ -44,7 +45,7 @@ void AnimatedEntityRenderer::AnimatedEntityRenderer::render(const RenderScene& r
 
         entity->mesh_hierarchy->calculate_animation(entity->animation_id, entity->animation_time_seconds);
         entity->mesh_hierarchy->visit_nodes([this, &entity](const MeshHierarchyNode& node, glm::mat4 accumulated_transformation) {
-            for (const auto& mesh_id: node.meshes) {
+            for (const auto& mesh_id : node.meshes) {
                 const auto& mesh = entity->mesh_hierarchy->meshes[mesh_id];
 
                 shader.set_model_matrix(entity->instance_data.model_matrix * accumulated_transformation);
@@ -57,34 +58,8 @@ void AnimatedEntityRenderer::AnimatedEntityRenderer::render(const RenderScene& r
     }
 }
 
-bool AnimatedEntityRenderer::AnimatedEntityRenderer::refresh_shaders() {
-    return shader.reload_files();
-}
 
-void AnimatedEntityRenderer::VertexData::from_mesh(const VertexCollection& vertex_collection, std::vector<VertexData>& out_vertices) {
-    out_vertices.reserve(out_vertices.size() + vertex_collection.positions.size());
 
-    if (vertex_collection.bones.empty() || vertex_collection.bones.size() != vertex_collection.positions.size()) {
-        throw std::runtime_error("AnimatedEntityRenderer::VertexData requires bones");
-    }
-    if (vertex_collection.normals.empty() || vertex_collection.normals.size() != vertex_collection.positions.size()) {
-        throw std::runtime_error("AnimatedEntityRenderer::VertexData requires normals");
-    }
-
-    if (vertex_collection.tex_coords.empty() || vertex_collection.tex_coords.size() != vertex_collection.positions.size()) {
-//        throw std::runtime_error("AnimatedEntityRenderer::VertexData requires texture coordinates");
-    }
-
-    for (auto i = 0u; i < vertex_collection.positions.size(); i++) {
-        out_vertices.push_back(VertexData{
-            vertex_collection.positions[i],
-            vertex_collection.normals[i],
-            i < vertex_collection.tex_coords.size() ? vertex_collection.tex_coords[i] : glm::vec2{0.0f},
-            vertex_collection.bones[i].first,
-            vertex_collection.bones[i].second
-        });
-    }
-}
 
 
 void AnimatedEntityRenderer::VertexData::setup_attrib_pointers() {
