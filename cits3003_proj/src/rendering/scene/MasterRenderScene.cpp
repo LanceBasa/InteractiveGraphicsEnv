@@ -37,3 +37,16 @@ void MasterRenderScene::insert_light(std::shared_ptr<PointLight> point_light) {
 bool MasterRenderScene::remove_light(const std::shared_ptr<PointLight>& point_light) {
     return light_scene.point_lights.erase(point_light) != 0;
 }
+
+
+void MasterRenderScene::set_directional_light(std::shared_ptr<DirectionalLight> directional_light) {
+    light_scene.directional_light = std::move(directional_light);
+}
+
+bool MasterRenderScene::remove_directional_light(std::shared_ptr<DirectionalLight> directional_light) {
+    if (directional_light) {
+        directional_light.reset();
+        return true;
+    }
+    return false;
+}
