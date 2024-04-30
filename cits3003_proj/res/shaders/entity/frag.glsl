@@ -12,6 +12,13 @@ layout (std140) uniform PointLightArray {
 };
 #endif
 
+// Direction Data
+#if NUM_PL_DIR > 0
+layout (std140) uniform DirectionLightArray {
+    DirectionLightArray direction_lights[NUM_PL_DIR];
+};
+#endif
+
 
 // Global Data
 uniform float inverse_gamma;
@@ -42,6 +49,9 @@ void main() {
     LightingResult vertex_out_lighting_result = total_light_calculation(light_calculation_data, material
         #if NUM_PL > 0
         ,point_lights
+        #endif
+        #if NUM_PL_DIR > 0
+        ,direction_lights
         #endif
     );
 

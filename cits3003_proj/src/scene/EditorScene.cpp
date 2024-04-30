@@ -9,7 +9,7 @@
 #include "editor_scene/EntityElement.h"
 #include "editor_scene/AnimatedEntityElement.h"
 #include "editor_scene/EmissiveEntityElement.h"
-#include "editor_scene/PointLightDir.h"
+#include "editor_scene/PointLightElement.h"
 #include "editor_scene/GroupElement.h"
 #include "scene/SceneContext.h"
 
