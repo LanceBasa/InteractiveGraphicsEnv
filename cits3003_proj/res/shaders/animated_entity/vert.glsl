@@ -31,9 +31,9 @@ layout (std140) uniform PointLightArray {
 #endif
 
 // Directional Light Data
-#if NUM_DL > 0
+#if NUM_PL_DIR > 0
 layout (std140) uniform DirectionalLightArray {
-    DirectionalLightData directional_lights[NUM_DL];
+    DirectionalLightData directional_lights[NUM_PL_DIR];
 };
 #endif
 
@@ -76,7 +76,7 @@ void main() {
         ,point_lights
         #endif
 
-        #if NUM_DL > 0
+        #if NUM_PL_DIR > 0
         ,directional_lights
         #endif
     );

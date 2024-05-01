@@ -14,8 +14,8 @@ layout (std140) uniform PointLightArray {
 
 // Direction Data
 #if NUM_PL_DIR > 0
-layout (std140) uniform DirectionLightArray {
-    DirectionLightArray direction_lights[NUM_PL_DIR];
+layout (std140) uniform PointLightDirectionArray {
+    DirectionalLightData direction_lights[NUM_PL_DIR];
 };
 #endif
 

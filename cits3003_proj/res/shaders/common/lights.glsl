@@ -32,6 +32,14 @@ struct DirectionalLightData {
     vec3 colour;
 };
 
+// Total Calculation
+
+struct LightingResult {
+    vec3 total_diffuse;
+    vec3 total_specular;
+    vec3 total_ambient;
+};
+
 
 
 // Calculations
@@ -96,13 +104,7 @@ void point_light_dir_calculation(DirectionalLightData dir_light, LightCalculatio
     total_ambient += ambient_component;
 }
 
-// Total Calculation
 
-struct LightingResult {
-    vec3 total_diffuse;
-    vec3 total_specular;
-    vec3 total_ambient;
-};
 
 LightingResult total_light_calculation(LightCalculatioData light_calculation_data, Material material
         #if NUM_PL > 0
