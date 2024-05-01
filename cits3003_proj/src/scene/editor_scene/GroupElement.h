@@ -10,6 +10,8 @@ namespace EditorScene {
         /// NOTE: Must be unique per element type, as it is used to select generators,
         ///       so if you are creating a new element type make sure to change this to a new unique name.
         static constexpr const char* ELEMENT_TYPE_NAME = "Group";
+        // static constexpr const char* ELEMENT_TYPE_NAME_1 = "Group_1";
+
 
         std::shared_ptr<std::list<std::unique_ptr<SceneElement>>> children;
 

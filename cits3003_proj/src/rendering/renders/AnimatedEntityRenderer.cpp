@@ -36,6 +36,7 @@ void AnimatedEntityRenderer::AnimatedEntityRenderer::render(const RenderScene& r
         // so that issue won't happen since it only recompiles on a change.
         // Just make sure to be careful of this kind of thing.
         shader.set_point_lights(light_scene.get_nearest_point_lights(position, BaseLitEntityShader::MAX_PL, 1));
+        shader.set_directional_light(light_scene.get_nearest_point_lights_dir(position, BaseLitEntityShader::MAX_PL_DIR, 1));
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, entity->render_data.diffuse_texture->get_texture_id());
@@ -56,47 +57,6 @@ void AnimatedEntityRenderer::AnimatedEntityRenderer::render(const RenderScene& r
         });
     }
 }
-
-//AnimatedEntityRenderer::AnimatedEntityRenderer::AnimatedEntityRenderer() : shader() {}
-
-
-void AnimatedEntityRenderer::AnimatedEntityRenderer::render_dir(const RenderScene& render_scene, const LightSceneDirection& light_scene_dire) {
-    shader.use();
-    shader.set_global_data(render_scene.global_data);
-
-    for (const auto& entity: render_scene.entities) {
-        shader.set_instance_data(entity->instance_data);
-
-        glm::vec3 position = entity->instance_data.model_matrix[3];
-        // IMPORTANT NOTE:
-        // This call has the potential to recompile the shader if the value for "NUM_PL" changes.
-        // If this where to happen for every entity, it would MASSIVELY kill performance (and possibly just not even work at all).
-        // However, in this case, consecutive get_nearest_point_lights calls WILL return the same number of items,
-        // so that issue won't happen since it only recompiles on a change.
-        // Just make sure to be careful of this kind of thing.
-        shader.set_directional_light(light_scene_dire.get_nearest_point_lights_dir(position, BaseLitEntityShader::MAX_PL_DIR, 1));
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, entity->render_data.diffuse_texture->get_texture_id());
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, entity->render_data.specular_map_texture->get_texture_id());
-
-        entity->mesh_hierarchy->calculate_animation(entity->animation_id, entity->animation_time_seconds);
-        entity->mesh_hierarchy->visit_nodes([this, &entity](const MeshHierarchyNode& node, glm::mat4 accumulated_transformation) {
-            for (const auto& mesh_id: node.meshes) {
-                const auto& mesh = entity->mesh_hierarchy->meshes[mesh_id];
-
-                shader.set_model_matrix(entity->instance_data.model_matrix * accumulated_transformation);
-                if (!mesh.bone_transforms.empty()) shader.set_bone_transforms(mesh.bone_transforms);
-
-                glBindVertexArray(mesh.model->get_vao());
-                glDrawElementsBaseVertex(GL_TRIANGLES, mesh.model->get_index_count(), GL_UNSIGNED_INT, nullptr, mesh.model->get_vertex_offset());
-            }
-        });
-    }
-
-}
-
 
 
 

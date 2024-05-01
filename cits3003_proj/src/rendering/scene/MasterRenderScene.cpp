@@ -38,12 +38,12 @@ bool MasterRenderScene::remove_light(const std::shared_ptr<PointLight>& point_li
     return light_scene.point_lights.erase(point_light) != 0;
 }
 
-void MasterRenderScene::insert_light(std::shared_ptr<PointLightDirection> point_light_dir) {
-    light_scene_dir.point_lights_dir.insert(std::move(point_light_dir));
+void MasterRenderScene::insert_light_dir(std::shared_ptr<PointLightDirection> point_light_dir) {
+    light_scene.point_lights_dir.insert(std::move(point_light_dir));
 }
 
-bool MasterRenderScene::remove_light(const std::shared_ptr<PointLightDirection>& point_light_dir) {
-    return light_scene_dir.point_lights_dir.erase(point_light_dir) != 0;
+bool MasterRenderScene::remove_light_dir(const std::shared_ptr<PointLightDirection>& point_light_dir) {
+    return light_scene.point_lights_dir.erase(point_light_dir) != 0;
 }
 
 

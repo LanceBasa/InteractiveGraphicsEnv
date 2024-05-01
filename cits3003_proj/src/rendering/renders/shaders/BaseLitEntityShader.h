@@ -58,8 +58,10 @@ protected:
     int texture_scale_location{};
 
     static const uint POINT_LIGHT_BINDING = 0;
+    static const uint POINT_LIGHT_DIR_BINDING = 1;
 
     UniformBufferArray<PointLight::Data, MAX_PL> point_lights_ubo;
+    UniformBufferArray<PointLightDirection::Data, MAX_PL_DIR> point_lights_dir_ubo;
 public:
     BaseLitEntityShader(std::string name, const std::string& vertex_path, const std::string& fragment_path,
                         std::unordered_map<std::string, std::string> vert_defines = {},

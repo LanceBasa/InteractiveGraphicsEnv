@@ -51,12 +51,12 @@ std::vector<Light> LightScene::get_nearest_lights(const std::unordered_set<std::
     return result;
 }
 
-std::vector<PointLightDirection> LightSceneDirection::get_nearest_point_lights_dir(glm::vec3 target, size_t max_count, size_t min_count) const {
+std::vector<PointLightDirection> LightScene::get_nearest_point_lights_dir(glm::vec3 target, size_t max_count, size_t min_count) const {
     return get_nearest_lights_dir(point_lights_dir, target, max_count, min_count);
 }
 
 template<typename Light>
-std::vector<Light> LightSceneDirection::get_nearest_lights_dir(const std::unordered_set<std::shared_ptr<Light>>& lights, glm::vec3 target, size_t max_count, size_t min_count) {
+std::vector<Light> LightScene::get_nearest_lights_dir(const std::unordered_set<std::shared_ptr<Light>>& lights, glm::vec3 target, size_t max_count, size_t min_count) {
     if (lights.size() <= max_count) {
         // No need to store if we are just going to return them all anyway.
 

@@ -34,33 +34,6 @@ struct PointLight {
     };
 };
 
-/// A collection of each light type, with helpers that allow for selecting a subset of
-/// those lights on a proximity basis, since processing an unbounded number of lights on the GPU is bad idea.
-struct LightScene {
-    std::unordered_set<std::shared_ptr<PointLight>> point_lights;
-
-    /// Will return up to `max_count` nearest point lights to `target`.
-    /// It returns less than `max_count` if there are not that many point lights,
-    /// in which case it will end up returning all point lights.
-    ///
-    /// If a `min_count` > 0 is provided, it will provide at least that many, with filling empty
-    /// slots with a "Black" light.
-    ///
-    /// NOTE: This is VERY inefficient as is, since it currently (possibly) sorts all lights,
-    ///       then copies out up to `max_count` point lights, so is O(n log(n)) for
-    ///       n being the total number of point lights.
-    ///
-    ///       So an improvement would be to use a data structure which can accelerate this,
-    ///       as well as support incrementally getting the `k` nearest.
-    ///
-    std::vector<PointLight> get_nearest_point_lights(glm::vec3 target, size_t max_count, size_t min_count = 0) const;
-
-private:
-    template<typename Light>
-    static std::vector<Light> get_nearest_lights(const std::unordered_set<std::shared_ptr<Light>>& lights, glm::vec3 target, size_t max_count, size_t min_count = 0);
-};
-
-/// A representation of a PointLightDirection render scene element
 struct PointLightDirection {
     PointLightDirection() = default;
 
@@ -89,7 +62,13 @@ struct PointLightDirection {
 
 /// A collection of each light type, with helpers that allow for selecting a subset of
 /// those lights on a proximity basis, since processing an unbounded number of lights on the GPU is bad idea.
-struct LightSceneDirection {
+
+
+/// A collection of each light type, with helpers that allow for selecting a subset of
+/// those lights on a proximity basis, since processing an unbounded number of lights on the GPU is bad idea.
+struct LightScene {
+    std::unordered_set<std::shared_ptr<PointLight>> point_lights;
+
     std::unordered_set<std::shared_ptr<PointLightDirection>> point_lights_dir;
 
     /// Will return up to `max_count` nearest point lights to `target`.
@@ -108,9 +87,32 @@ struct LightSceneDirection {
     ///
     std::vector<PointLightDirection> get_nearest_point_lights_dir(glm::vec3 target, size_t max_count, size_t min_count = 0) const;
 
+
+    
+
+
+    /// Will return up to `max_count` nearest point lights to `target`.
+    /// It returns less than `max_count` if there are not that many point lights,
+    /// in which case it will end up returning all point lights.
+    ///
+    /// If a `min_count` > 0 is provided, it will provide at least that many, with filling empty
+    /// slots with a "Black" light.
+    ///
+    /// NOTE: This is VERY inefficient as is, since it currently (possibly) sorts all lights,
+    ///       then copies out up to `max_count` point lights, so is O(n log(n)) for
+    ///       n being the total number of point lights.
+    ///
+    ///       So an improvement would be to use a data structure which can accelerate this,
+    ///       as well as support incrementally getting the `k` nearest.
+    ///
+    std::vector<PointLight> get_nearest_point_lights(glm::vec3 target, size_t max_count, size_t min_count = 0) const;
+
 private:
+    template<typename Light>
+    static std::vector<Light> get_nearest_lights(const std::unordered_set<std::shared_ptr<Light>>& lights, glm::vec3 target, size_t max_count, size_t min_count = 0);
     template<typename Light>
     static std::vector<Light> get_nearest_lights_dir(const std::unordered_set<std::shared_ptr<Light>>& lights, glm::vec3 target, size_t max_count, size_t min_count = 0);
 };
 
+/// A representation of a PointLightDirection render scene element
 #endif //LIGHTS_H

@@ -6,7 +6,7 @@ BaseLitEntityShader::BaseLitEntityShader(std::string name, const std::string& ve
                                          std::unordered_map<std::string, std::string> vert_defines,
                                          std::unordered_map<std::string, std::string> frag_defines) :
     BaseEntityShader(std::move(name), vertex_path, fragment_path, std::move(vert_defines), std::move(frag_defines)),
-    point_lights_ubo({}, false) {
+    point_lights_ubo({}, false), point_lights_dir_ubo({}, false) {
 
     get_uniforms_set_bindings();
 }
@@ -24,6 +24,7 @@ void BaseLitEntityShader::get_uniforms_set_bindings() {
     set_binding("specular_map_texture", 1);
     // Uniform block bindings
     set_block_binding("PointLightArray", POINT_LIGHT_BINDING);
+    set_block_binding("PointLightDirectionArray", POINT_LIGHT_DIR_BINDING);
 }
 
 void BaseLitEntityShader::set_instance_data(const BaseLitEntityInstanceData& instance_data) {
@@ -61,18 +62,18 @@ void BaseLitEntityShader::set_point_lights(const std::vector<PointLight>& point_
 }
 
 void BaseLitEntityShader::set_directional_light(const std::vector<PointLightDirection>& point_lights_dir) {
-    uint count = std::min(MAX_PL, (uint) point_lights_dir.size());
+    uint count = std::min(MAX_PL_DIR, (uint) point_lights_dir.size());
 
     for (uint i = 0; i < count; i++) {
         const PointLightDirection& point_light_dir = point_lights_dir[i];
 
         glm::vec3 scaled_colour = glm::vec3(point_light_dir.colour) * point_light_dir.colour.a;
 
-        point_lights_ubo.data[i].position = point_light_dir.position;
-        point_lights_ubo.data[i].colour = scaled_colour;
+        point_lights_dir_ubo.data[i].position = point_light_dir.position;
+        point_lights_dir_ubo.data[i].colour = scaled_colour;
     }
 
     set_frag_define("NUM_DL", Formatter() << count);
-    point_lights_ubo.bind(POINT_LIGHT_BINDING);
-    point_lights_ubo.upload();
+    point_lights_dir_ubo.bind(POINT_LIGHT_DIR_BINDING);
+    point_lights_dir_ubo.upload();
 }
