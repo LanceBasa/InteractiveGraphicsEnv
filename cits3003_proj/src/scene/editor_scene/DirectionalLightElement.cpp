@@ -9,7 +9,7 @@
 std::unique_ptr<EditorScene::PointLightDir> EditorScene::PointLightDir::new_default(const SceneContext& scene_context, EditorScene::ElementRef parent) {
     auto light_element = std::make_unique<PointLightDir>(
         parent,
-        "New Point Light",
+        "New Directional Light",
         glm::vec3{0.0f, 1.0f, 0.0f},
         PointLightDirection::create(
             glm::vec3{}, // Set via update_instance_data()
@@ -30,6 +30,8 @@ std::unique_ptr<EditorScene::PointLightDir> EditorScene::PointLightDir::new_defa
     );
 
     light_element->update_instance_data();
+    light_element->pitch = -45.0f; // Set default pitch
+    light_element->yaw = 0.0f; // Set default yaw
     return light_element;
 }
 
@@ -40,6 +42,8 @@ std::unique_ptr<EditorScene::PointLightDir> EditorScene::PointLightDir::from_jso
     light_element->light_dir->colour = j["colour"];
     light_element->visible = j["visible"];
     light_element->visual_scale = j["visual_scale"];
+    light_element->pitch = j["pitch"];
+    light_element->yaw = j["yaw"];
 
     light_element->update_instance_data();
     return light_element;
@@ -51,6 +55,8 @@ json EditorScene::PointLightDir::into_json() const {
         {"colour",       light_dir->colour},
         {"visible",      visible},
         {"visual_scale", visual_scale},
+        {"pitch", pitch},
+        {"yaw", yaw},
     };
 }
 
@@ -62,7 +68,16 @@ void EditorScene::PointLightDir::add_imgui_edit_section(MasterRenderScene& rende
     bool transformUpdated = false;
     transformUpdated |= ImGui::DragFloat3("Translation", &position[0], 0.01f);
     ImGui::DragDisableCursor(scene_context.window);
+
+
+    //Pitch and Yaw to be added in here
+    ImGui::Text("Pitch");
+    transformUpdated |= ImGui::DragFloat("Pitch", &pitch, 0.05f, -90.0f, 90.0f);
+    ImGui::Text("Yaw");
+    transformUpdated |= ImGui::DragFloat("Yaw", &yaw, 0.05f, -180.0f, 180.0f);
     ImGui::Spacing();
+
+
 
     ImGui::Text("Light Properties");
     transformUpdated |= ImGui::ColorEdit3("Colour", &light_dir->colour[0]);
@@ -90,9 +105,25 @@ void EditorScene::PointLightDir::update_instance_data() {
         transform = (*parent)->transform * transform;
     }
 
+
+    // Update light and light sphere
+    float yaw_rad = glm::radians(yaw);
+    float pitch_rad = glm::radians(pitch);
+
+    glm::vec3 direction = glm::vec3(glm::cos(yaw_rad) * glm::cos(pitch_rad),
+                                    glm::sin(pitch_rad),
+                                    glm::sin(yaw_rad) * glm::cos(pitch_rad));
+
+    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), yaw_rad, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), pitch_rad, glm::vec3(1.0f, 0.0f, 0.0f));
+    light_dir->position = glm::vec3(rotation * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f));
+
+
+
+
+
     light_dir->position = glm::vec3(transform[3]); // Extract translation from matrix
     if (visible) {
-        light_sphere_dir->instance_data.model_matrix = transform * glm::scale(glm::vec3{0.1f * visual_scale});
+        light_sphere_dir->instance_data.model_matrix = transform * rotation *  glm::scale(glm::vec3{0.1f * visual_scale});
     } else {
         // Throw off to infinity as a hacky way to make model invisible
         light_sphere_dir->instance_data.model_matrix = glm::scale(glm::vec3{std::numeric_limits<float>::infinity()}) * glm::translate(glm::vec3{std::numeric_limits<float>::infinity()});

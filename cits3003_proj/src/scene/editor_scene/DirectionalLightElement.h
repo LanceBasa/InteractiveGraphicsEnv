@@ -13,8 +13,11 @@ namespace EditorScene  {
 
         // Local transformation
         glm::vec3 position;
+        glm::vec3 direction;
         bool visible = true;
         float visual_scale = 1.0f;
+        float pitch = -45.0f;
+        float yaw = 0.0f;
         // PointLight and Entity will store World position
         //std::shared_ptr<PointLight> light;
         std::shared_ptr<PointLightDirection> light_dir;
@@ -22,7 +25,7 @@ namespace EditorScene  {
         std::shared_ptr<EmissiveEntityRenderer::Entity> light_sphere_dir;
 
         PointLightDir(const ElementRef& parent, std::string name, glm::vec3 position, std::shared_ptr<PointLightDirection> light_dir, std::shared_ptr<EmissiveEntityRenderer::Entity> light_sphere_dir) :
-            SceneElement(parent, std::move(name)), position(position), light_dir(std::move(light_dir)), light_sphere_dir(std::move(light_sphere_dir)) {}
+        SceneElement(parent, std::move(name)), position(position), light_dir(std::move(light_dir)), light_sphere_dir(std::move(light_sphere_dir)) {}
 
         static std::unique_ptr<PointLightDir> new_default(const SceneContext& scene_context, ElementRef parent);
         static std::unique_ptr<PointLightDir> from_json(const SceneContext& scene_context, ElementRef parent, const json& j);

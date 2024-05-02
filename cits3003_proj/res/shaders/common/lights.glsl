@@ -28,7 +28,7 @@ struct PointLightData {
 
 // Directional Light
 struct DirectionalLightData {
-    vec3 direction;
+    vec3 position;
     vec3 colour;
 };
 
@@ -80,11 +80,12 @@ void point_light_dir_calculation(DirectionalLightData dir_light, LightCalculatio
 
 
     // using this we can get the light distance to the object
-    vec3 ws_light_offset = dir_light.direction - calculation_data.ws_frag_position; 
-    float distance = length(ws_light_offset);       // length is a function that calculates the length from Euclidean distance between the fragment position and
+    //vec3 ws_light_offset = dir_light.position - calculation_data.ws_frag_position; 
+    vec3 ws_light_offset = normalize(dir_light.position);
+    //float distance = length(ws_light_offset);       // length is a function that calculates the length from Euclidean distance between the fragment position and
     float lossRate=0.2;                        // Rate of quickly the light loss with distance.
-    float attenuation = 1.0 / (1.0 + lossRate * distance + (lossRate* distance*distance));        // From lecture calculating Light attenuation with distance
-
+    float attenuation = 1.0 / (1.0 + lossRate   + (lossRate));        // From lecture calculating Light attenuation with distance
+    //float attenuation =1.0;
 
     // Ambient
     vec3 ambient_component = ambient_factor * dir_light.colour; // ambiance doesnt require attenuation (distance)
