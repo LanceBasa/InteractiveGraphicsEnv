@@ -49,6 +49,7 @@ struct PointLightDirection {
     }
 
     glm::vec3 position{};
+    glm::vec3 direction{};
     // Alpha components are just used to store a scalar that is applied before passing to the GPU
     glm::vec4 colour{};
 

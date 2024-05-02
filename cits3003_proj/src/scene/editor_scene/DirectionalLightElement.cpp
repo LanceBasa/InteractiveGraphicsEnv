@@ -38,6 +38,7 @@ std::unique_ptr<EditorScene::PointLightDir> EditorScene::PointLightDir::new_defa
 std::unique_ptr<EditorScene::PointLightDir> EditorScene::PointLightDir::from_json(const SceneContext& scene_context, EditorScene::ElementRef parent, const json& j) {
     auto light_element = new_default(scene_context, parent);
 
+    light_element->direction = j["direction"];
     light_element->position = j["position"];
     light_element->light_dir->colour = j["colour"];
     light_element->visible = j["visible"];
@@ -51,6 +52,7 @@ std::unique_ptr<EditorScene::PointLightDir> EditorScene::PointLightDir::from_jso
 
 json EditorScene::PointLightDir::into_json() const {
     return {
+        {"direction",     direction},
         {"position",     position},
         {"colour",       light_dir->colour},
         {"visible",      visible},
@@ -120,10 +122,10 @@ void EditorScene::PointLightDir::update_instance_data() {
 
 
 
-
+    light_dir->direction = direction;
     light_dir->position = glm::vec3(transform[3]); // Extract translation from matrix
     if (visible) {
-        light_sphere_dir->instance_data.model_matrix = transform * rotation *  glm::scale(glm::vec3{0.1f * visual_scale});
+        light_sphere_dir->instance_data.model_matrix = transform * rotation * glm::rotate(glm::radians(-90.0f),glm::vec3(1.0f, 0.0f, 0.0f)) *  glm::scale(glm::vec3{0.1f * visual_scale});
     } else {
         // Throw off to infinity as a hacky way to make model invisible
         light_sphere_dir->instance_data.model_matrix = glm::scale(glm::vec3{std::numeric_limits<float>::infinity()}) * glm::translate(glm::vec3{std::numeric_limits<float>::infinity()});
