@@ -2,8 +2,14 @@
 
 #include <algorithm>
 
+// Create a similar copy of Point Light for Direction Lught
+
 std::vector<PointLight> LightScene::get_nearest_point_lights(glm::vec3 target, size_t max_count, size_t min_count) const {
     return get_nearest_lights(point_lights, target, max_count, min_count);
+}
+
+std::vector<PointLightDirection> LightScene::get_nearest_point_lights_dir(glm::vec3 target, size_t max_count, size_t min_count) const {
+    return get_nearest_lights_dir(point_lights_dir, target, max_count, min_count);
 }
 
 template<typename Light>
@@ -51,9 +57,7 @@ std::vector<Light> LightScene::get_nearest_lights(const std::unordered_set<std::
     return result;
 }
 
-std::vector<PointLightDirection> LightScene::get_nearest_point_lights_dir(glm::vec3 target, size_t max_count, size_t min_count) const {
-    return get_nearest_lights_dir(point_lights_dir, target, max_count, min_count);
-}
+
 
 template<typename Light>
 std::vector<Light> LightScene::get_nearest_lights_dir(const std::unordered_set<std::shared_ptr<Light>>& lights, glm::vec3 target, size_t max_count, size_t min_count) {

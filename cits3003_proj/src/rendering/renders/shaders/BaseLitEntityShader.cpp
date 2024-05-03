@@ -2,6 +2,9 @@
 
 #include <utility>
 
+// For adding direction light source similar to point light source
+// directional lighting needs direction not position vector
+
 BaseLitEntityShader::BaseLitEntityShader(std::string name, const std::string& vertex_path, const std::string& fragment_path,
                                          std::unordered_map<std::string, std::string> vert_defines,
                                          std::unordered_map<std::string, std::string> frag_defines) :
@@ -22,7 +25,6 @@ void BaseLitEntityShader::get_uniforms_set_bindings() {
     // Texture sampler bindings
     set_binding("diffuse_texture", 0);
     set_binding("specular_map_texture", 1);
-    // Uniform block bindings
     set_block_binding("PointLightArray", POINT_LIGHT_BINDING);
     set_block_binding("PointLightDirectionArray", POINT_LIGHT_DIR_BINDING);
 }
@@ -69,7 +71,7 @@ void BaseLitEntityShader::set_directional_light(const std::vector<PointLightDire
 
         glm::vec3 scaled_colour = glm::vec3(point_light_dir.colour) * point_light_dir.colour.a;
 
-        point_lights_dir_ubo.data[i].position = point_light_dir.position;
+        point_lights_dir_ubo.data[i].direction = point_light_dir.direction;
         point_lights_dir_ubo.data[i].colour = scaled_colour;
     }
 

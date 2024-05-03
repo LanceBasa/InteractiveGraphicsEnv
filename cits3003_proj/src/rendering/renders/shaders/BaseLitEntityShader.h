@@ -18,6 +18,7 @@
 
 #include "BaseEntityShader.h"
 
+// add similar details to pointlight for direction light
 struct BaseLitEntityMaterial {
     // Alpha components are just used to store a scalar that is applied before passing to the GPU
     glm::vec4 diffuse_tint;

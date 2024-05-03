@@ -6,11 +6,15 @@
 #include "rendering/imgui/ImGuiManager.h"
 #include "scene/SceneContext.h"
 
+// new directional light element cpp and header file - a similar copy of point light with some tweaks
+// directional light has direction vector, pitch and yaw
+
 std::unique_ptr<EditorScene::PointLightDir> EditorScene::PointLightDir::new_default(const SceneContext& scene_context, EditorScene::ElementRef parent) {
     auto light_element = std::make_unique<PointLightDir>(
         parent,
         "New Directional Light",
         glm::vec3{0.0f, 1.0f, 0.0f},
+        glm::vec3(0.0f, 0.0f, 0.0f),
         PointLightDirection::create(
             glm::vec3{}, // Set via update_instance_data()
             glm::vec4{1.0f}
@@ -30,15 +34,16 @@ std::unique_ptr<EditorScene::PointLightDir> EditorScene::PointLightDir::new_defa
     );
 
     light_element->update_instance_data();
-    light_element->pitch = -45.0f; // Set default pitch
-    light_element->yaw = 0.0f; // Set default yaw
+    // no need to set default pitch and yaw. already set in header file
+    // light_element->pitch = 45.0f; // Set default pitch
+    // light_element->yaw = 0.0f; // Set default yaw
     return light_element;
 }
 
 std::unique_ptr<EditorScene::PointLightDir> EditorScene::PointLightDir::from_json(const SceneContext& scene_context, EditorScene::ElementRef parent, const json& j) {
     auto light_element = new_default(scene_context, parent);
 
-    light_element->direction = j["direction"];
+    //light_element->direction = j["direction"];
     light_element->position = j["position"];
     light_element->light_dir->colour = j["colour"];
     light_element->visible = j["visible"];
@@ -52,7 +57,7 @@ std::unique_ptr<EditorScene::PointLightDir> EditorScene::PointLightDir::from_jso
 
 json EditorScene::PointLightDir::into_json() const {
     return {
-        {"direction",     direction},
+        // {"direction",     direction},
         {"position",     position},
         {"colour",       light_dir->colour},
         {"visible",      visible},
@@ -73,10 +78,11 @@ void EditorScene::PointLightDir::add_imgui_edit_section(MasterRenderScene& rende
 
 
     //Pitch and Yaw to be added in here
-    ImGui::Text("Pitch");
     transformUpdated |= ImGui::DragFloat("Pitch", &pitch, 0.05f, -90.0f, 90.0f);
-    ImGui::Text("Yaw");
+    ImGui::DragDisableCursor(scene_context.window);
+    ImGui::Spacing();
     transformUpdated |= ImGui::DragFloat("Yaw", &yaw, 0.05f, -180.0f, 180.0f);
+    ImGui::DragDisableCursor(scene_context.window);
     ImGui::Spacing();
 
 
@@ -112,23 +118,19 @@ void EditorScene::PointLightDir::update_instance_data() {
     float yaw_rad = glm::radians(yaw);
     float pitch_rad = glm::radians(pitch);
 
-    glm::vec3 direction = glm::vec3(glm::cos(yaw_rad) * glm::cos(pitch_rad),
-                                    glm::sin(pitch_rad),
-                                    glm::sin(yaw_rad) * glm::cos(pitch_rad));
 
-    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), yaw_rad, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), pitch_rad, glm::vec3(1.0f, 0.0f, 0.0f));
-    light_dir->position = glm::vec3(rotation * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f));
+    // create a rotation matrix for pitch and yaw. passing the angle and rotation around the x and y axis
+    const glm::mat4 rad_rotation = glm::rotate(glm::mat4(1.0f), yaw_rad, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), pitch_rad, glm::vec3(1.0f, 0.0f, 0.0f));
 
-
-
-
-    light_dir->direction = direction;
+    light_dir->direction = direction = rad_rotation *glm::vec4(0.0f, 0.0f, -1.0f,0.0f) ;
     light_dir->position = glm::vec3(transform[3]); // Extract translation from matrix
     if (visible) {
-        light_sphere_dir->instance_data.model_matrix = transform * rotation * glm::rotate(glm::radians(-90.0f),glm::vec3(1.0f, 0.0f, 0.0f)) *  glm::scale(glm::vec3{0.1f * visual_scale});
+        light_sphere_dir->instance_data.model_matrix = transform * rad_rotation * glm::rotate(glm::radians(-90.0f),glm::vec3(1.0f, 0.0f, 0.0f)) *  glm::scale(glm::vec3{0.1f * visual_scale});
     } else {
-        // Throw off to infinity as a hacky way to make model invisible
-        light_sphere_dir->instance_data.model_matrix = glm::scale(glm::vec3{std::numeric_limits<float>::infinity()}) * glm::translate(glm::vec3{std::numeric_limits<float>::infinity()});
+        // two ways, translate to infinity or scale it down very small. or 3 ways, combine both. here the scale is loweered.
+        light_sphere_dir->instance_data.model_matrix = glm::scale(glm::vec3{std::numeric_limits<float>::infinity()});
+        // alternative way
+        // light_sphere_dir->instance_data.model_matrix =glm::translate(glm::vec3{std::numeric_limits<float>::infinity()});
     }
 
     glm::vec3 normalised_colour = glm::vec3(light_dir->colour) / glm::compMax(glm::vec3(light_dir->colour));

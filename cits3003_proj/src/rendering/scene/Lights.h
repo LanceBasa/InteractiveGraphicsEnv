@@ -7,6 +7,9 @@
 
 #include <glm/glm.hpp>
 
+// add struct for directional light which has extra field for direction of the light
+// position is still there for display purposes
+
 /// A representation of a PointLight render scene element
 struct PointLight {
     PointLight() = default;
@@ -44,19 +47,18 @@ struct PointLightDirection {
         return {glm::vec3{}, glm::vec4{}};
     }
 
-    static std::shared_ptr<PointLightDirection> create(const glm::vec3& position, const glm::vec4& colour) {
+    static std::shared_ptr<PointLightDirection> create(const glm::vec3& position,  const glm::vec4& colour) {
         return std::make_shared<PointLightDirection>(position, colour);
     }
 
     glm::vec3 position{};
     glm::vec3 direction{};
-    // Alpha components are just used to store a scalar that is applied before passing to the GPU
     glm::vec4 colour{};
 
     // On GPU format
     // alignas used to conform to std140 for direct binary usage with glsl
     struct Data {
-        alignas(16) glm::vec3 position;
+        alignas(16) glm::vec3 direction;
         alignas(16) glm::vec3 colour;
     };
 };
@@ -69,7 +71,6 @@ struct PointLightDirection {
 /// those lights on a proximity basis, since processing an unbounded number of lights on the GPU is bad idea.
 struct LightScene {
     std::unordered_set<std::shared_ptr<PointLight>> point_lights;
-
     std::unordered_set<std::shared_ptr<PointLightDirection>> point_lights_dir;
 
     /// Will return up to `max_count` nearest point lights to `target`.
