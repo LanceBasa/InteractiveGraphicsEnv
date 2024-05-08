@@ -112,18 +112,17 @@ void EditorScene::PointLightDir::update_instance_data() {
     float yaw_rad = glm::radians(yaw);
     float pitch_rad = glm::radians(pitch);
 
-    glm::vec3 direction = glm::vec3(glm::cos(yaw_rad) * glm::cos(pitch_rad),
-                                    glm::sin(pitch_rad),
-                                    glm::sin(yaw_rad) * glm::cos(pitch_rad));
 
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), yaw_rad, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), pitch_rad, glm::vec3(1.0f, 0.0f, 0.0f));
-    light_dir->position = glm::vec3(rotation * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f));
+    
+    
+    light_dir->direction =  glm::vec3(rotation * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f));
 
 
 
 
-    light_dir->direction = direction;
-    light_dir->position = glm::vec3(transform[3]); // Extract translation from matrix
+    // light_dir->direction = direction;
+    // light_dir->direction = glm::vec3(transform[3]); // Extract translation from matrix
     if (visible) {
         light_sphere_dir->instance_data.model_matrix = transform * rotation * glm::rotate(glm::radians(-90.0f),glm::vec3(1.0f, 0.0f, 0.0f)) *  glm::scale(glm::vec3{0.1f * visual_scale});
     } else {

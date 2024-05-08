@@ -69,7 +69,7 @@ void BaseLitEntityShader::set_directional_light(const std::vector<PointLightDire
 
         glm::vec3 scaled_colour = glm::vec3(point_light_dir.colour) * point_light_dir.colour.a;
 
-        point_lights_dir_ubo.data[i].position = point_light_dir.position;
+        point_lights_dir_ubo.data[i].direction = point_light_dir.direction;
         point_lights_dir_ubo.data[i].colour = scaled_colour;
     }
 
