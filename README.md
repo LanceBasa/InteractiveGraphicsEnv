@@ -1,5 +1,5 @@
 <!-- # CITS3003 Project S1 2024
-## Authors: Lance Basa (23420659), Sahil Narula (23313963)
+## Authors: Lance Basa 23420659, Sahil Narula 23313963
 
 ##
 Built using the following OS
