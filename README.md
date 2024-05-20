@@ -56,7 +56,7 @@ Built in Ubuntu VSCode environment
     ```bash
         ./cits3003_project 
     ```
-Note: When running in VScode, ensure that GTK_PATH is set to none.
+Note: When running in VScode, ensure that GTK_PATH is set to none for load and save to work.
 To check if GTK_PATH is set, run:
     ```bash
         echo $GTK_PATH
