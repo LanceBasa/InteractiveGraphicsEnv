@@ -1,4 +1,5 @@
 #version 410 core
+#include "../common/lights.glsl"
 #include "../common/maths.glsl"
 
 // Per vertex data
@@ -16,6 +17,28 @@ out VertexOut {
 
 // Per instance data
 uniform mat4 model_matrix;
+
+
+// Material properties not required here in vertex. fragment will do the work
+// uniform vec3 diffuse_tint;
+// uniform vec3 specular_tint;
+// uniform vec3 ambient_tint;
+// uniform float shininess;
+
+// Light Data. This is also moved to fragment shader to improve realism
+// as 
+// #if NUM_PL > 0
+// layout (std140) uniform PointLightArray {
+//     PointLightData point_lights[NUM_PL];
+// };
+// #endif
+
+// // Directional Light Data
+// #if NUM_PL_DIR > 0
+// layout (std140) uniform DirectionalLightArray {
+//     DirectionalLightData directional_lights[NUM_PL_DIR];
+// };
+// #endif
 
 // Animation Data
 uniform mat4 bone_transforms[BONE_TRANSFORMS];
@@ -35,10 +58,10 @@ void main() {
         + (1.0f - sum) * mat4(1.0f);
 
     mat4 animation_matrix = model_matrix * bone_transform;
-    mat3 normal_matrix = transpose((mat3(animation_matrix))); // Correct normal transformation
+    mat3 normal_matrix = cofactor(animation_matrix);
 
     vec3 ws_position = (animation_matrix * vec4(vertex_position, 1.0f)).xyz;
-    vec3 ws_normal = normalize(normal_matrix * normal); // Correct normal normalization
+    vec3 ws_normal = normalize(normal_matrix * normal);
     vertex_out.texture_coordinate = texture_coordinate;
     vertex_out.ws_position = ws_position;
     vertex_out.ws_normal = ws_normal;

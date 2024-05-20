@@ -1,6 +1,8 @@
 #version 410 core
 #include "../common/lights.glsl"
 
+
+// This should be comming in from vertex shader file
 in VertexOut {
     vec3 ws_position;
     vec3 ws_normal;
