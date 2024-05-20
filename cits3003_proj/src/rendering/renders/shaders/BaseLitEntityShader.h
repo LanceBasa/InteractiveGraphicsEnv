@@ -47,7 +47,7 @@ using BaseLitEntityGlobalData = BaseEntityGlobalData;
 class BaseLitEntityShader : public BaseEntityShader {
 public:
     static constexpr uint MAX_PL = 16;
-    static constexpr uint MAX_PL_DIR = 4;
+    static constexpr uint MAX_PL_DIR = 16;
 
 protected:
     // Material
