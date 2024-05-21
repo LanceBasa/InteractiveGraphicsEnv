@@ -25,7 +25,7 @@ namespace EditorScene  {
 
         std::shared_ptr<EmissiveEntityRenderer::Entity> light_sphere_spot;
 
-        SpotLightElement(const ElementRef& parent, std::string name, glm::vec3 position, std::shared_ptr<PointLightDirection> light_dir, std::shared_ptr<EmissiveEntityRenderer::Entity> light_sphere_dir) :
+        SpotLightElement(const ElementRef& parent, std::string name, glm::vec3 position, std::shared_ptr<SpotLight> slight, std::shared_ptr<EmissiveEntityRenderer::Entity> light_sphere_spot) :
         SceneElement(parent, std::move(name)), position(position) ,slight(std::move(slight)), light_sphere_spot(std::move(light_sphere_spot)) {}
 
         static std::unique_ptr<SpotLightElement> new_default(const SceneContext& scene_context, ElementRef parent);
@@ -44,7 +44,7 @@ namespace EditorScene  {
 
         void remove_from_render_scene(MasterRenderScene& target_render_scene) override {
             target_render_scene.remove_entity(light_sphere_spot);
-            target_render_scene.remove_light_dir(slight);
+            target_render_scene.remove_light_spot(slight);
         }
 
         [[nodiscard]] const char* element_type_name() const override;

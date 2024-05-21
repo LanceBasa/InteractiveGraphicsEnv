@@ -103,7 +103,7 @@ std::vector<Light> LightScene::get_nearest_lights_dir(const std::unordered_set<s
 
 
 std::vector<SpotLight> LightScene::get_nearest_spot_lights(glm::vec3 target, size_t max_count, size_t min_count) const {
-    return get_nearest_lights_spot(spot_lights, target, max_count, min_count);
+    return get_nearest_lights(spot_lights, target, max_count, min_count);
 }
 
 template<typename Light>

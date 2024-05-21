@@ -11,7 +11,8 @@ std::unique_ptr<EditorScene::SpotLightElement> EditorScene::SpotLightElement::ne
         parent,
         "New Spot Light",
         glm::vec3{0.0f, 1.0f, 0.0f},
-        PointLightDirection::create(
+        SpotLight::create(
+            glm::vec3{},
             glm::vec3{}, // Set via update_instance_data()
             glm::vec4{1.0f}
         ),
@@ -38,8 +39,8 @@ std::unique_ptr<EditorScene::SpotLightElement> EditorScene::SpotLightElement::ne
 std::unique_ptr<EditorScene::SpotLightElement> EditorScene::SpotLightElement::from_json(const SceneContext& scene_context, EditorScene::ElementRef parent, const json& j) {
     auto light_element = new_default(scene_context, parent);
 
-    light_element->direction = j["direction"];
     light_element->position = j["position"];
+    light_element->direction = j["direction"];
     light_element->slight->colour = j["colour"];
     light_element->visible = j["visible"];
     light_element->visual_scale = j["visual_scale"];
@@ -52,8 +53,8 @@ std::unique_ptr<EditorScene::SpotLightElement> EditorScene::SpotLightElement::fr
 
 json EditorScene::SpotLightElement::into_json() const {
     return {
-        {"direction",     direction},
         {"position",     position},
+        {"direction",     direction},
         {"colour",       slight->colour},
         {"visible",      visible},
         {"visual_scale", visual_scale},
@@ -106,13 +107,14 @@ void EditorScene::SpotLightElement::update_instance_data() {
         // Post multiply by transform so that local transformations are applied first
         transform = (*parent)->transform * transform;
     }
-    
+    slight->position = glm::vec3(transform[3]); // Extract translation from matrix
+
     // Update light and light sphere
     float yaw_rad = glm::radians(yaw);
     float pitch_rad = glm::radians(pitch);
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), yaw_rad, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), pitch_rad, glm::vec3(1.0f, 0.0f, 0.0f));
     
-    slight->direction =  glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f));
+    slight->direction =  glm::vec3(rotation * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f));
     if (visible) {
         light_sphere_spot->instance_data.model_matrix = transform * rotation * glm::rotate(glm::radians(-90.0f),glm::vec3(1.0f, 0.0f, 0.0f)) *  glm::scale(glm::vec3{0.1f * visual_scale});
     } else {

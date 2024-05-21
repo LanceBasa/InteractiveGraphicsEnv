@@ -19,6 +19,13 @@ layout (std140) uniform PointLightDirectionArray {
 };
 #endif
 
+// Direction Data
+#if NUM_SL > 0
+layout (std140) uniform SpotLightArray {
+    SpotLightData spot_lights[NUM_SL];
+};
+#endif
+
 
 // Global Data
 uniform float inverse_gamma;
@@ -52,6 +59,9 @@ void main() {
         #endif
         #if NUM_PL_DIR > 0
         ,direction_lights
+        #endif
+        #if NUM_SL > 0
+        ,spot_lights
         #endif
     );
 

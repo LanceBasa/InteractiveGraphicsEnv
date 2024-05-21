@@ -31,6 +31,12 @@ layout (std140) uniform PointLightDirectionArray {
 };
 #endif
 
+#if NUM_SL > 0
+layout (std140) uniform SpotLightArray {
+    SpotLightData spot_light[NUM_SL];
+};
+#endif
+
 uniform float inverse_gamma;
 uniform sampler2D diffuse_texture;
 uniform sampler2D specular_map_texture;
@@ -47,6 +53,10 @@ void main() {
 
         #if NUM_PL_DIR > 0
         ,dir_light
+        #endif
+
+        #if NUM_SL > 0
+        ,spot_light
         #endif
     );
 

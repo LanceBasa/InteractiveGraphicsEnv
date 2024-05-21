@@ -6,6 +6,10 @@
 #define NUM_PL_DIR 0
 #endif
 
+#ifndef NUM_SL
+#define NUM_SL 0
+#endif
+
 // Material Properties
 struct Material {
     vec3 diffuse_tint;
@@ -29,6 +33,13 @@ struct PointLightData {
 // Directional Light
 struct DirectionalLightData {
     //vec3 position;
+    vec3 direction;
+    vec3 colour;
+};
+
+// Directional Light
+struct SpotLightData {
+    vec3 position;
     vec3 direction;
     vec3 colour;
 };
@@ -106,6 +117,46 @@ void point_light_dir_calculation(DirectionalLightData dir_light, LightCalculatio
     total_ambient += ambient_component;
 }
 
+// Directional Lights
+void point_light_spot_calculation(SpotLightData spot_light, LightCalculatioData calculation_data, float shininess, inout vec3 total_diffuse, inout vec3 total_specular, inout vec3 total_ambient) {
+
+    
+    // else  // else, use ambient light so scene isn't completely dark outside the spotlight.
+    // color = vec4(light.ambient * vec3(texture(material.diffuse, TexCoords)), 1.0);
+
+
+    // using this we can get the light distance to the object
+    vec3 ws_light_offset = spot_light.position - calculation_data.ws_frag_position; 
+    float distance = length(ws_light_offset);       // length is a function that calculates the length from Euclidean distance between the fragment position and
+    float lossRate=0.2;                        // Rate of quickly the light loss with distance.
+    float attenuation = 1.0 / (1.0 + lossRate * distance + (lossRate* distance*distance));        // From lecture calculating Light attenuation with distance
+
+
+    // Ambient
+    vec3 ambient_component = ambient_factor * spot_light.colour; // ambiance doesnt require attenuation (distance)
+
+    // Diffuse
+    vec3 ws_light_dir = normalize(ws_light_offset);
+    float diffuse_factor = max(dot(ws_light_dir, calculation_data.ws_normal), 0.0f);
+    vec3 diffuse_component = diffuse_factor * spot_light.colour * attenuation;
+
+    // Specular
+    vec3 ws_halfway_dir = normalize(ws_light_dir + calculation_data.ws_view_dir);
+    float specular_factor = pow(max(dot(calculation_data.ws_normal, ws_halfway_dir), 0.0f), shininess);
+    vec3 specular_component = specular_factor * spot_light.colour *attenuation;
+
+    float angle = 0.52;
+
+    float theta = dot(ws_light_dir, normalize(spot_light.direction));
+    
+    if(theta > angle) 
+    {       
+        total_diffuse += diffuse_component;
+        total_specular += specular_component;
+        total_ambient += ambient_component;
+    }
+}
+
 
 
 LightingResult total_light_calculation(LightCalculatioData light_calculation_data, Material material
@@ -116,6 +167,10 @@ LightingResult total_light_calculation(LightCalculatioData light_calculation_dat
 
         #if NUM_PL_DIR > 0
         ,DirectionalLightData dir_lights[NUM_PL_DIR]
+        #endif
+
+        #if NUM_SL > 0
+        ,SpotLightData spot_light[NUM_SL]
         #endif
     ) {
 
@@ -135,12 +190,22 @@ LightingResult total_light_calculation(LightCalculatioData light_calculation_dat
     }
     #endif
 
+    #if NUM_SL > 0
+    for (int i = 0; i < NUM_SL; i++) {
+        point_light_spot_calculation(spot_light[i], light_calculation_data, material.shininess, total_diffuse, total_specular, total_ambient);
+    }
+    #endif
+
     #if NUM_PL > 0
     total_ambient /= float(NUM_PL);
     #endif
 
     #if NUM_PL_DIR > 0
     total_ambient /= float(NUM_PL_DIR);
+    #endif
+
+    #if NUM_SL > 0
+    total_ambient /= float(NUM_SL);
     #endif
 
     total_diffuse *= material.diffuse_tint;

@@ -87,8 +87,10 @@ void BaseLitEntityShader::set_spot_light(const std::vector<SpotLight>& spot_ligh
 
         glm::vec3 scaled_colour = glm::vec3(spot_light.colour) * spot_light.colour.a;
 
+        spot_lights_ubo.data[i].position = spot_light.position;
         spot_lights_ubo.data[i].direction = spot_light.direction;
         spot_lights_ubo.data[i].colour = scaled_colour;
+        
     }
 
     set_frag_define("NUM_SL", Formatter() << count);
