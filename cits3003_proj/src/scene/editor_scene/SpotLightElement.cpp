@@ -1,0 +1,129 @@
+#include "SpotLightElement.h"
+
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/component_wise.hpp>
+
+#include "rendering/imgui/ImGuiManager.h"
+#include "scene/SceneContext.h"
+
+std::unique_ptr<EditorScene::SpotLightElement> EditorScene::SpotLightElement::new_default(const SceneContext& scene_context, EditorScene::ElementRef parent) {
+    auto light_element = std::make_unique<SpotLightElement>(
+        parent,
+        "New Spot Light",
+        glm::vec3{0.0f, 1.0f, 0.0f},
+        PointLightDirection::create(
+            glm::vec3{}, // Set via update_instance_data()
+            glm::vec4{1.0f}
+        ),
+        EmissiveEntityRenderer::Entity::create(
+            scene_context.model_loader.load_from_file<EmissiveEntityRenderer::VertexData>("cone.obj"),
+            EmissiveEntityRenderer::InstanceData{
+                glm::mat4{}, // Set via update_instance_data()
+                EmissiveEntityRenderer::EmissiveEntityMaterial{
+                    glm::vec4{1.0f}
+                }
+            },
+            EmissiveEntityRenderer::RenderData{
+                scene_context.texture_loader.default_white_texture()
+            }
+        )
+    );
+
+    light_element->update_instance_data();
+    light_element->pitch = -45.0f; // Set default pitch
+    light_element->yaw = 0.0f; // Set default yaw
+    return light_element;
+}
+
+std::unique_ptr<EditorScene::SpotLightElement> EditorScene::SpotLightElement::from_json(const SceneContext& scene_context, EditorScene::ElementRef parent, const json& j) {
+    auto light_element = new_default(scene_context, parent);
+
+    light_element->direction = j["direction"];
+    light_element->position = j["position"];
+    light_element->slight->colour = j["colour"];
+    light_element->visible = j["visible"];
+    light_element->visual_scale = j["visual_scale"];
+    light_element->pitch = j["pitch"];
+    light_element->yaw = j["yaw"];
+
+    light_element->update_instance_data();
+    return light_element;
+}
+
+json EditorScene::SpotLightElement::into_json() const {
+    return {
+        {"direction",     direction},
+        {"position",     position},
+        {"colour",       slight->colour},
+        {"visible",      visible},
+        {"visual_scale", visual_scale},
+        {"pitch", pitch},
+        {"yaw", yaw},
+    };
+}
+
+void EditorScene::SpotLightElement::add_imgui_edit_section(MasterRenderScene& render_scene, const SceneContext& scene_context) {
+    ImGui::Text("Spot Light");
+    SceneElement::add_imgui_edit_section(render_scene, scene_context);
+
+    ImGui::Text("Local Transformation");
+    bool transformUpdated = false;
+    transformUpdated |= ImGui::DragFloat3("Translation", &position[0], 0.01f);
+    ImGui::DragDisableCursor(scene_context.window);
+
+
+    //Pitch and Yaw to be added in here
+    ImGui::Text("Pitch");
+    transformUpdated |= ImGui::DragFloat("Pitch", &pitch, 0.05f, -90.0f, 90.0f);
+    ImGui::Text("Yaw");
+    transformUpdated |= ImGui::DragFloat("Yaw", &yaw, 0.05f, -180.0f, 180.0f);
+    ImGui::Spacing();
+
+
+
+    ImGui::Text("Light Properties");
+    transformUpdated |= ImGui::ColorEdit3("Colour", &slight->colour[0]);
+    ImGui::Spacing();
+    ImGui::DragFloat("Intensity", &slight->colour.a, 0.01f, 0.0f, FLT_MAX);
+    ImGui::DragDisableCursor(scene_context.window);
+
+    ImGui::Spacing();
+    ImGui::Text("Visuals");
+
+    transformUpdated |= ImGui::Checkbox("Show Visuals", &visible);
+    transformUpdated |= ImGui::DragFloat("Visual Scale", &visual_scale, 0.01f, 0.0f, FLT_MAX);
+    ImGui::DragDisableCursor(scene_context.window);
+
+    if (transformUpdated) {
+        update_instance_data();
+    }
+}
+
+void EditorScene::SpotLightElement::update_instance_data() {
+    transform = glm::translate(position);
+
+    if (!EditorScene::is_null(parent)) {
+        // Post multiply by transform so that local transformations are applied first
+        transform = (*parent)->transform * transform;
+    }
+    
+    // Update light and light sphere
+    float yaw_rad = glm::radians(yaw);
+    float pitch_rad = glm::radians(pitch);
+    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), yaw_rad, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), pitch_rad, glm::vec3(1.0f, 0.0f, 0.0f));
+    
+    slight->direction =  glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f));
+    if (visible) {
+        light_sphere_spot->instance_data.model_matrix = transform * rotation * glm::rotate(glm::radians(-90.0f),glm::vec3(1.0f, 0.0f, 0.0f)) *  glm::scale(glm::vec3{0.1f * visual_scale});
+    } else {
+        // Throw off to infinity as a hacky way to make model invisible
+        light_sphere_spot->instance_data.model_matrix = glm::scale(glm::vec3{std::numeric_limits<float>::infinity()}) * glm::translate(glm::vec3{std::numeric_limits<float>::infinity()});
+    }
+
+    glm::vec3 normalised_colour = glm::vec3(slight->colour) / glm::compMax(glm::vec3(slight->colour));
+    light_sphere_spot->instance_data.material.emission_tint = glm::vec4(normalised_colour, light_sphere_spot->instance_data.material.emission_tint.a);
+}
+
+const char* EditorScene::SpotLightElement::element_type_name() const {
+    return ELEMENT_TYPE_NAME;
+}

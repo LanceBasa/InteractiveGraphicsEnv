@@ -41,6 +41,9 @@ public:
 
     bool remove_light_dir(const std::shared_ptr<PointLightDirection>& point_light_dir);
 
+    void insert_spot_light(std::shared_ptr<SpotLight> spot_light);
+
+    bool remove_light_dir(const std::shared_ptr<SpotLight>& spot_light);
     /// Propagates a camera state to all the render scenes
     void use_camera(const CameraInterface& camera_interface);
 

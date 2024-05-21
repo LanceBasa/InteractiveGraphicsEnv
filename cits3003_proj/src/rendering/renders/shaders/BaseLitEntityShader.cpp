@@ -6,7 +6,7 @@ BaseLitEntityShader::BaseLitEntityShader(std::string name, const std::string& ve
                                          std::unordered_map<std::string, std::string> vert_defines,
                                          std::unordered_map<std::string, std::string> frag_defines) :
     BaseEntityShader(std::move(name), vertex_path, fragment_path, std::move(vert_defines), std::move(frag_defines)),
-    point_lights_ubo({}, false), point_lights_dir_ubo({}, false) {
+    point_lights_ubo({}, false), point_lights_dir_ubo({}, false), spot_lights_ubo({},false) {
 
     get_uniforms_set_bindings();
 }
@@ -25,6 +25,7 @@ void BaseLitEntityShader::get_uniforms_set_bindings() {
     // Uniform block bindings
     set_block_binding("PointLightArray", POINT_LIGHT_BINDING);
     set_block_binding("PointLightDirectionArray", POINT_LIGHT_DIR_BINDING);
+    set_block_binding("SpotLightArray", SPOT_LIGHT_BINDING);
 }
 
 void BaseLitEntityShader::set_instance_data(const BaseLitEntityInstanceData& instance_data) {
@@ -76,4 +77,21 @@ void BaseLitEntityShader::set_directional_light(const std::vector<PointLightDire
     set_frag_define("NUM_PL_DIR", Formatter() << count);
     point_lights_dir_ubo.bind(POINT_LIGHT_DIR_BINDING);
     point_lights_dir_ubo.upload();
+}
+
+void BaseLitEntityShader::set_spot_light(const std::vector<SpotLight>& spot_lights) {
+    uint count = std::min(MAX_SL, (uint) spot_lights.size());
+
+    for (uint i = 0; i < count; i++) {
+        const SpotLight& spot_light = spot_lights[i];
+
+        glm::vec3 scaled_colour = glm::vec3(spot_light.colour) * spot_light.colour.a;
+
+        spot_lights_ubo.data[i].direction = spot_light.direction;
+        spot_lights_ubo.data[i].colour = scaled_colour;
+    }
+
+    set_frag_define("NUM_SL", Formatter() << count);
+    spot_lights_ubo.bind(SPOT_LIGHT_BINDING);
+    spot_lights_ubo.upload();
 }

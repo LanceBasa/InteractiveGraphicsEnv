@@ -44,6 +44,7 @@ void EntityRenderer::EntityRenderer::render(const RenderScene& render_scene, con
         // Just make sure to be careful of this kind of thing.
         shader.set_point_lights(light_scene.get_nearest_point_lights(position, BaseLitEntityShader::MAX_PL, 1)); //May need to change this to 0 FIX ME
         shader.set_directional_light(light_scene.get_nearest_point_lights_dir(position, BaseLitEntityShader::MAX_PL_DIR, 1));
+        shader.set_spot_light(light_scene.get_nearest_spot_lights(position, BaseLitEntityShader::MAX_SL, 1));
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, entity->render_data.diffuse_texture->get_texture_id());

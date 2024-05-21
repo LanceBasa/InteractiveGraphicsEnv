@@ -47,7 +47,9 @@ using BaseLitEntityGlobalData = BaseEntityGlobalData;
 class BaseLitEntityShader : public BaseEntityShader {
 public:
     static constexpr uint MAX_PL = 16;
-    static constexpr uint MAX_PL_DIR = 16;
+    static constexpr uint MAX_PL_DIR = 4;
+    static constexpr uint MAX_SL = 4;
+
 
 protected:
     // Material
@@ -59,19 +61,23 @@ protected:
 
     static const uint POINT_LIGHT_BINDING = 0;
     static const uint POINT_LIGHT_DIR_BINDING = 1;
+    static const uint SPOT_LIGHT_BINDING = 2;
+
 
     UniformBufferArray<PointLight::Data, MAX_PL> point_lights_ubo;
     UniformBufferArray<PointLightDirection::Data, MAX_PL_DIR> point_lights_dir_ubo;
+    UniformBufferArray<SpotLight::Data, MAX_SL> spot_lights_ubo;
+
 public:
     BaseLitEntityShader(std::string name, const std::string& vertex_path, const std::string& fragment_path,
                         std::unordered_map<std::string, std::string> vert_defines = {},
                         std::unordered_map<std::string, std::string> frag_defines = {});
 
     void set_instance_data(const BaseLitEntityInstanceData& instance_data);
-
     void set_point_lights(const std::vector<PointLight>& point_lights);
-
     void set_directional_light(const std::vector<PointLightDirection>& point_lights_dir); 
+    void set_spot_light(const std::vector<SpotLight>& spot_lights); 
+
 protected:
     void get_uniforms_set_bindings() override;
 };

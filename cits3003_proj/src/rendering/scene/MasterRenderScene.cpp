@@ -46,4 +46,10 @@ bool MasterRenderScene::remove_light_dir(const std::shared_ptr<PointLightDirecti
     return light_scene.point_lights_dir.erase(point_light_dir) != 0;
 }
 
+void MasterRenderScene::insert_spot_light(std::shared_ptr<SpotLight> spot_light) {
+    light_scene.spot_lights.insert(std::move(spot_light));
+}
 
+bool MasterRenderScene::remove_light_dir(const std::shared_ptr<SpotLight>& spot_light) {
+    return light_scene.spot_lights.erase(spot_light) != 0;
+}
