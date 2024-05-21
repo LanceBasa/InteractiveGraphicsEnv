@@ -115,6 +115,17 @@ json EditorScene::LocalTransformComponent::local_transform_into_json() const {
         {"scale", scale},
     }};
 }
+float random_float() {
+    // Seed the random number generator if it hasn't been seeded yet
+    static bool seeded = false;
+    if (!seeded) {
+        std::srand(static_cast<unsigned int>(std::time(nullptr)));
+        seeded = true;
+    }
+
+    // Generate a random float between 0 and 1
+    return static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
+}
 
 void EditorScene::LitMaterialComponent::add_material_imgui_edit_section(MasterRenderScene& render_scene, const SceneContext& scene_context) {
     // Set this to true if the user has changed any of the material values, otherwise the changes won't be propagated
@@ -148,6 +159,17 @@ void EditorScene::LitMaterialComponent::add_material_imgui_edit_section(MasterRe
     
     material_changed |= ImGui::DragFloat("Texture Scale", &material.texture_scale, 0.01f, 0.0f, FLT_MAX);
     ImGui::DragDisableCursor(scene_context.window);
+    ImGui::Spacing();
+
+    if (ImGui::Button("Party Time")) {
+        // Generate random colors for the material
+        material.diffuse_tint = glm::vec4(random_float(), random_float(), random_float(), 1.0f);
+        material.specular_tint = glm::vec4(random_float(), random_float(), random_float(), 1.0f);
+        material.ambient_tint = glm::vec4(random_float(), random_float(), random_float(), 1.0f);
+
+        // Mark material as changed
+        material_changed = true;
+    }
     ImGui::Spacing();
 
 
