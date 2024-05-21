@@ -12,6 +12,11 @@ PanningCamera::PanningCamera() : distance(init_distance), focus_point(init_focus
 PanningCamera::PanningCamera(float distance, glm::vec3 focus_point, float pitch, float yaw, float near, float fov)
     : init_distance(distance), init_focus_point(focus_point), init_pitch(pitch), init_yaw(yaw), init_near(near), init_fov(fov), distance(distance), focus_point(focus_point), pitch(pitch), yaw(yaw), near(near), fov(fov) {}
 
+
+bool left_mouse_clicked = false; // Flag to track left mouse button clicks
+char userInput[256]; // Array to store user input
+std::vector<std::string> toDoList;
+
 void PanningCamera::update(const Window& window, float dt, bool controls_enabled) {
     if (controls_enabled) {
         bool ctrl_is_pressed = window.is_key_pressed(GLFW_KEY_LEFT_CONTROL) || window.is_key_pressed(GLFW_KEY_RIGHT_CONTROL);
@@ -43,6 +48,32 @@ void PanningCamera::update(const Window& window, float dt, bool controls_enabled
                 window.set_cursor_disabled(true);
             }
         }
+
+        bool is_left_mouse_pressed = window.is_mouse_pressed(GLFW_MOUSE_BUTTON_LEFT);
+        if (is_left_mouse_pressed) {
+            left_mouse_clicked = !left_mouse_clicked; // Toggle the flag when left mouse button is clicked
+        }
+
+        if (left_mouse_clicked) {
+            ImGui::Begin("Text Input Window");
+            if (ImGui::InputText("##userInput", userInput, IM_ARRAYSIZE(userInput), ImGuiInputTextFlags_EnterReturnsTrue)) {
+                if (strlen(userInput) > 0) {
+                    toDoList.push_back(userInput); // Add input to To Do list
+                    userInput[0] = '\0'; // Clear the input field
+                }
+            }
+
+            ImGui::Text("To Do List:");
+            for (int i = 0; i < toDoList.size(); ++i) {
+                ImGui::BulletText("%s", toDoList[i].c_str());
+                ImGui::SameLine();
+                if (ImGui::Button(("Remove##" + std::to_string(i)).c_str())) {
+                    toDoList.erase(toDoList.begin() + i); // Remove the item from the list
+                }
+            }
+            ImGui::End();
+        }
+        
     }
 
     yaw = std::fmod(yaw + YAW_PERIOD, YAW_PERIOD);
